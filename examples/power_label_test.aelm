@@ -1,0 +1,49 @@
+// Simple label position test - one symbol per row, wide spacing
+
+part PWR {
+    pins {
+        pin: passive @1
+    }
+    symbol: power_flag
+}
+
+part G {
+    pins {
+        pin: passive @1
+    }
+    symbol: gnd_flag
+}
+
+part Resistor {
+    pins {
+        a: passive @1
+        b: passive @2
+    }
+    symbol: two_terminal
+}
+
+module LabelTest {
+    instances {
+        // Power flag rotations - wide spacing
+        P0: PWR place: (4, 4)
+        P90: PWR place: (12, 4) rot: 90
+        P180: PWR place: (20, 4) rot: 180
+        P270: PWR place: (28, 4) rot: 270
+
+        // GND flag rotations - wide spacing
+        G0: G place: (4, 12)
+        G90: G place: (12, 12) rot: 90
+        G180: G place: (20, 12) rot: 180
+        G270: G place: (28, 12) rot: 270
+
+        // Dummy for connections
+        RD: Resistor place: (36, 8)
+    }
+    connections {
+        P0.pin -> RD.a
+        G0.pin -> RD.b
+        P90.pin -> P180.pin
+        P270.pin -> G90.pin
+        G180.pin -> G270.pin
+    }
+}

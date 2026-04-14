@@ -1,0 +1,144 @@
+// Power and ground symbol showcase
+// All variants at all rotations (R0, R90, R180, R270)
+
+part PWR_FLAG {
+    pins {
+        pin: passive @1
+    }
+    symbol: power_flag
+}
+
+part PWR_ARROW {
+    pins {
+        pin: passive @1
+    }
+    symbol: power_arrow
+}
+
+part GND_SIGNAL {
+    pins {
+        pin: passive @1
+    }
+    symbol: gnd_flag
+}
+
+part GND_TRI {
+    pins {
+        pin: passive @1
+    }
+    symbol: gnd_triangle
+}
+
+part GND_EARTH {
+    pins {
+        pin: passive @1
+    }
+    symbol: gnd_earth
+}
+
+part GND_PE {
+    pins {
+        pin: passive @1
+    }
+    symbol: gnd_protective
+}
+
+part Resistor {
+    pins {
+        a: passive @1
+        b: passive @2
+    }
+    symbol: two_terminal
+}
+
+module PowerSymbolShowcase {
+    instances {
+        // Row 1: Power flag at all rotations
+        PF_R0: PWR_FLAG place: (3, 3)
+        PF_R90: PWR_FLAG place: (8, 3) rot: 90
+        PF_R180: PWR_FLAG place: (13, 3) rot: 180
+        PF_R270: PWR_FLAG place: (18, 3) rot: 270
+
+        // Row 2: Power arrow at all rotations
+        PA_R0: PWR_ARROW place: (3, 8)
+        PA_R90: PWR_ARROW place: (8, 8) rot: 90
+        PA_R180: PWR_ARROW place: (13, 8) rot: 180
+        PA_R270: PWR_ARROW place: (18, 8) rot: 270
+
+        // Row 3: GND signal (three lines) at all rotations
+        GS_R0: GND_SIGNAL place: (3, 13)
+        GS_R90: GND_SIGNAL place: (8, 13) rot: 90
+        GS_R180: GND_SIGNAL place: (13, 13) rot: 180
+        GS_R270: GND_SIGNAL place: (18, 13) rot: 270
+
+        // Row 4: GND triangle at all rotations
+        GT_R0: GND_TRI place: (3, 18)
+        GT_R90: GND_TRI place: (8, 18) rot: 90
+        GT_R180: GND_TRI place: (13, 18) rot: 180
+        GT_R270: GND_TRI place: (18, 18) rot: 270
+
+        // Row 5: GND earth at all rotations
+        GE_R0: GND_EARTH place: (3, 23)
+        GE_R90: GND_EARTH place: (8, 23) rot: 90
+        GE_R180: GND_EARTH place: (13, 23) rot: 180
+        GE_R270: GND_EARTH place: (18, 23) rot: 270
+
+        // Row 6: GND protective earth at all rotations
+        GP_R0: GND_PE place: (3, 28)
+        GP_R90: GND_PE place: (8, 28) rot: 90
+        GP_R180: GND_PE place: (13, 28) rot: 180
+        GP_R270: GND_PE place: (18, 28) rot: 270
+
+        // Bus resistors connecting each row
+        R1: Resistor place: (22, 3)
+        R2: Resistor place: (22, 8)
+        R3: Resistor place: (22, 13)
+        R4: Resistor place: (22, 18)
+        R5: Resistor place: (22, 23)
+        R6: Resistor place: (22, 28)
+    }
+    connections {
+        // Row 1 power flags -> R1
+        PF_R0.pin -> R1.a
+        PF_R90.pin -> R1.a
+        PF_R180.pin -> R1.a
+        PF_R270.pin -> R1.a
+
+        // Row 2 power arrows -> R2
+        PA_R0.pin -> R2.a
+        PA_R90.pin -> R2.a
+        PA_R180.pin -> R2.a
+        PA_R270.pin -> R2.a
+
+        // Row 3 gnd signals -> R3
+        GS_R0.pin -> R3.a
+        GS_R90.pin -> R3.a
+        GS_R180.pin -> R3.a
+        GS_R270.pin -> R3.a
+
+        // Row 4 gnd triangles -> R4
+        GT_R0.pin -> R4.a
+        GT_R90.pin -> R4.a
+        GT_R180.pin -> R4.a
+        GT_R270.pin -> R4.a
+
+        // Row 5 gnd earth -> R5
+        GE_R0.pin -> R5.a
+        GE_R90.pin -> R5.a
+        GE_R180.pin -> R5.a
+        GE_R270.pin -> R5.a
+
+        // Row 6 gnd protective -> R6
+        GP_R0.pin -> R6.a
+        GP_R90.pin -> R6.a
+        GP_R180.pin -> R6.a
+        GP_R270.pin -> R6.a
+
+        // Chain resistors
+        R1.b -> R2.a
+        R2.b -> R3.a
+        R3.b -> R4.a
+        R4.b -> R5.a
+        R5.b -> R6.a
+    }
+}

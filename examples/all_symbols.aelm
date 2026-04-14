@@ -1,0 +1,136 @@
+// All symbol types showcase
+// Tests every built-in symbol with connections
+
+part Resistor {
+    pins {
+        a: passive @1
+        b: passive @2
+    }
+    symbol: two_terminal
+}
+
+part Capacitor {
+    pins {
+        a: passive @1
+        b: passive @2
+    }
+    symbol: capacitor
+}
+
+part Inductor {
+    pins {
+        a: passive @1
+        b: passive @2
+    }
+    symbol: inductor
+}
+
+part Diode {
+    pins {
+        anode: passive @1
+        cathode: passive @2
+    }
+    symbol: diode
+}
+
+part LED {
+    pins {
+        anode: passive @1
+        cathode: passive @2
+    }
+    symbol: led
+}
+
+part Zener {
+    pins {
+        anode: passive @1
+        cathode: passive @2
+    }
+    symbol: zener
+}
+
+part NPN {
+    pins {
+        b: input @1
+        c: output @2
+        e: passive @3
+    }
+    symbol: transistor_npn
+}
+
+part PNP {
+    pins {
+        b: input @1
+        c: output @2
+        e: passive @3
+    }
+    symbol: transistor_pnp
+}
+
+part OpAmp {
+    pins {
+        inp: input @1
+        inm: input @2
+        out: output @3
+        vcc: power @4
+        vee: power @5
+    }
+    symbol: op_amp
+}
+
+part NMOS {
+    pins {
+        g: input @1
+        d: output @2
+        s: passive @3
+    }
+    symbol: transistor_nmos
+}
+
+part PMOS {
+    pins {
+        g: input @1
+        d: output @2
+        s: passive @3
+    }
+    symbol: transistor_pmos
+}
+
+part Crystal {
+    pins {
+        a: passive @1
+        b: passive @2
+    }
+    symbol: crystal
+}
+
+module AllSymbols {
+    instances {
+        R1: Resistor
+        C1: Capacitor
+        L1: Inductor
+        D1: Diode
+        LED1: LED
+        Z1: Zener
+        Q1: NPN
+        Q2: PNP
+        U1: OpAmp
+        Q3: NMOS
+        Q4: PMOS
+        Y1: Crystal
+    }
+    connections {
+        R1.b -> C1.a
+        C1.b -> L1.a
+        L1.b -> D1.anode
+        D1.cathode -> LED1.anode
+        LED1.cathode -> Z1.anode
+        Z1.cathode -> Q1.b
+        Q1.c -> Q2.b
+        Q2.c -> U1.inp
+        U1.out -> Q3.g
+        Q3.d -> Q4.g
+        Q4.d -> Y1.a
+        Y1.b -> R1.a
+    }
+}

@@ -1,0 +1,78 @@
+// Hierarchy test: module-as-instance
+// Tests that modules can be instantiated as sub-circuits
+
+part Resistor {
+    pins {
+        a: passive @1
+        b: passive @2
+    }
+    symbol: two_terminal
+}
+
+part NPN {
+    pins {
+        b: input @1
+        c: output @2
+        e: passive @3
+    }
+    symbol: transistor_npn
+}
+
+part VCC {
+    pins {
+        pin: passive @1
+    }
+    symbol: power_flag
+}
+
+part GND {
+    pins {
+        pin: passive @1
+    }
+    symbol: gnd_flag
+}
+
+// Sub-module: a simple amplifier stage
+module Amplifier {
+    ports {
+        inp: passive in left.1
+        out: passive out right.1
+        vcc: power in top.1
+        gnd: power in bottom.1
+    }
+
+    instances {
+        Q1: NPN place: (5, 5)
+        R_BIAS: Resistor place: Q1.b(-2, 0)
+        R_LOAD: Resistor place: Q1.c(0, -2) rot: 90
+    }
+
+    connections {
+        inp -> R_BIAS.a
+        R_BIAS.b -> Q1.b
+        vcc -> R_LOAD.a
+        R_LOAD.b -> Q1.c
+        Q1.c -> out
+        Q1.e -> gnd
+    }
+}
+
+// Top-level module using Amplifier as instance
+module MainBoard {
+    instances {
+        AMP1: Amplifier place: (5, 8)
+        AMP2: Amplifier place: (15, 8)
+        R_COUPLING: Resistor place: (10, 8)
+        PWR: VCC place: (5, 2)
+        GND1: GND place: (15, 14)
+    }
+
+    connections {
+        PWR.pin -> AMP1.vcc
+        PWR.pin -> AMP2.vcc
+        AMP1.out -> R_COUPLING.a
+        R_COUPLING.b -> AMP2.inp
+        AMP1.gnd -> GND1.pin
+        AMP2.gnd -> GND1.pin
+    }
+}

@@ -1,0 +1,41 @@
+// Mirror test: NPN normal vs PNP mirrored horizontally
+part NPN {
+    pins {
+        b: input @1
+        c: output @2
+        e: passive @3
+    }
+    symbol: transistor_npn
+}
+
+part PNP {
+    pins {
+        b: input @1
+        c: output @2
+        e: passive @3
+    }
+    symbol: transistor_pnp
+}
+
+part Resistor {
+    pins {
+        a: passive @1
+        b: passive @2
+    }
+    symbol: two_terminal
+}
+
+module MirrorTest {
+    instances {
+        Q1: NPN place: (5, 5)
+        Q2: NPN place: (12, 5) mirror: horizontal
+        Q3: NPN place: (19, 5) mirror: vertical
+        R1: Resistor place: (5, 10)
+    }
+    connections {
+        Q1.c -> R1.a
+        Q2.c -> R1.b
+        Q3.b -> Q1.b
+        Q1.e -> Q2.e
+    }
+}

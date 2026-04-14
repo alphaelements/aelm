@@ -1,0 +1,19 @@
+// Hello Aelm — minimal circuit for testing
+part Resistor {
+    pins {
+        a: passive @1
+        b: passive @2
+    }
+    symbol: two_terminal
+}
+
+module Hello {
+    instances {
+        R1: Resistor(value: 1k)
+        R2: Resistor(value: 4.7k)
+    }
+    connections {
+        R1.b -> R2.a
+        R2.b -> R1.a
+    }
+}

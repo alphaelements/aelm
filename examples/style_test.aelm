@@ -1,0 +1,79 @@
+// Style cascade verification circuit
+// Tests: universal (*), type (Resistor, NPN), id (#R1), pseudo-elements
+
+part Resistor {
+    pins {
+        a: passive @1
+        b: passive @2
+    }
+    symbol: two_terminal
+}
+
+part Capacitor {
+    pins {
+        p1: passive @1
+        p2: passive @2
+    }
+    symbol: capacitor
+}
+
+part NPN {
+    pins {
+        b: input @1
+        c: output @2
+        e: passive @3
+    }
+    symbol: transistor_npn
+}
+
+part LED {
+    pins {
+        a: passive @1
+        k: passive @2
+    }
+    symbol: led
+}
+
+part VCC {
+    pins {
+        pin: passive @1
+    }
+    symbol: power_flag
+}
+
+part GND {
+    pins {
+        pin: passive @1
+    }
+    symbol: gnd_flag
+}
+
+module StyleTest {
+    instances {
+        // Resistors — R1 gets id-selector override (red), R2 stays type color (blue)
+        R1: Resistor(value: 1k) place: (5, 5)
+        R2: Resistor(value: 4.7k) place: (5, 15) rot: 90
+
+        // Capacitor — green via type selector
+        C1: Capacitor(value: 100n) place: (15, 5)
+
+        // NPN transistor — purple via type selector
+        Q1: NPN place: (10, 10)
+
+        // LED — orange via type selector
+        D1: LED place: (15, 15)
+
+        // Power symbols
+        VCC1: VCC place: (5, 1)
+        GND1: GND place: (10, 19)
+    }
+    connections {
+        VCC1.pin -> R1.a
+        R1.b -> Q1.c
+        Q1.b -> R2.a
+        Q1.e -> GND1.pin
+        R2.b -> C1.p1
+        C1.p2 -> D1.a
+        D1.k -> GND1.pin
+    }
+}

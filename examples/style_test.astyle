@@ -1,0 +1,85 @@
+// Aelm Style — Full Feature Verification
+// All implemented features with highly visible colors
+
+// Background — pale yellow
+background {
+    color: #fffacd;
+}
+
+// Grid — royal blue
+grid {
+    color: #4169e1;
+    sub_color: #b0c4de;
+    visible: true;
+}
+
+// Universal — dark gray base
+* {
+    stroke_color: #333333;
+    stroke_width: 0.3mm;
+    fill_color: #00000000;
+    opacity: 1.0;
+}
+
+// Text — large magenta labels
+text {
+    font_size: 2.5mm;
+    font_color: #ff00ff;
+}
+
+// Wire — thick red
+wire {
+    color: #ff0000;
+    width: 0.5mm;
+}
+
+// Bus — thick purple
+bus {
+    color: #9b59b6;
+    width: 0.8mm;
+}
+
+// Pin — gray
+pin {
+    stroke_color: #888888;
+    stroke_width: 0.2mm;
+}
+
+// Error — bright red
+error {
+    color: #ff0000;
+    font_size: 1.5mm;
+}
+
+// Type: Resistor → blue with light blue fill
+Resistor {
+    stroke_color: #0000ff;
+    stroke_width: 0.4mm;
+    fill_color: #cce0ff;
+}
+
+// Type: Capacitor → green
+Capacitor {
+    stroke_color: #00cc00;
+    stroke_width: 0.4mm;
+}
+
+// Type: NPN → purple
+NPN {
+    stroke_color: #9900cc;
+    stroke_width: 0.5mm;
+}
+
+// Type: LED → orange
+LED {
+    stroke_color: #ff8800;
+    stroke_width: 0.4mm;
+}
+
+// ID: R1 → red override + semi-transparent (opacity test)
+#R1 {
+    stroke_color: #ff0000;
+    stroke_width: 0.6mm;
+    fill_color: #ffcccc;
+    opacity: 0.6;
+}

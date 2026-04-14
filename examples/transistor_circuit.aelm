@@ -1,0 +1,72 @@
+// Constant-current source circuit
+// Ic = VBE(Q1) / RE2 ≈ 0.6V / RE2
+
+part NPN {
+    pins {
+        b: input @1
+        c: output @2
+        e: passive @3
+    }
+    symbol: transistor_npn
+}
+
+part Resistor {
+    pins {
+        a: passive @1
+        b: passive @2
+    }
+    symbol: two_terminal
+}
+
+part VCC {
+    pins {
+        pin: passive @1
+    }
+    symbol: power_flag
+}
+
+part GND {
+    pins {
+        pin: passive @1
+    }
+    symbol: gnd_flag
+}
+
+module ConstantCurrentSource {
+    instances {
+        // Transistors
+        Q1: NPN place: (5, 8)
+        Q2: NPN place: (14, 8)
+        // Collector pull-up resistors (vertical, VCC to collector)
+        RC1: Resistor place: Q1.c(0, -4) rot: 90
+        RC2: Resistor place: Q2.c(0, -4) rot: 90
+        // Base bias resistor (vertical, Q1.b down to 0.6V node)
+        Rb: Resistor place: Q1.b(-4, 0) rot: 90
+        // Emitter resistor (vertical, 0.6V node to GND)
+        RE2: Resistor place: Q2.e(0, 4) rot: 180
+        // Power symbols (above collector resistors)
+        VCC1: VCC place: (6, 1)
+        VCC2: VCC place: (15, 1)
+        // Ground symbols (below emitters)
+        GND1: GND place: (6, 11)
+        GND2: GND place: (15, 15)
+    }
+    connections {
+        // VCC -> collector resistors -> collectors
+        VCC1.pin -> RC1.a
+        RC1.b -> Q1.c
+        VCC2.pin -> RC2.a
+        RC2.b -> Q2.c
+        // Q1 collector drives Q2 base
+        Q1.c -> Q2.b
+        // Base bias: Q1.b -> Rb -> 0.6V node
+        Q1.b -> Rb.a
+        Rb.b -> Q2.e
+        // Q1 emitter to GND
+        Q1.e -> GND1.pin
+        // Q2 emitter to 0.6V node (= Rb.b = RE2.a)
+        Q2.e -> RE2.a
+        // RE2 to GND
+        RE2.b -> GND2.pin
+    }
+}
