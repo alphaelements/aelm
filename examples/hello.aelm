@@ -4,7 +4,7 @@ part Resistor {
         a: passive @1
         b: passive @2
     }
-    symbol: two_terminal
+    symbol: resistor
 }
 
 module Hello {
