@@ -1,0 +1,67 @@
+// Dual op-amp (LM358) wired as two independent inverting amplifiers
+// (Issue #122, #123, #136). Demonstrates the explicit `pins: { sym: part }`
+// mapping form so each part pin lands at the correct `op_amp` symbol pin
+// regardless of pad numbering.
+
+part LM358 {
+    pins {
+        out_a: output @1
+        inm_a: input @2
+        inp_a: input @3
+        gnd: ground @4
+        inp_b: input @5
+        inm_b: input @6
+        out_b: output @7
+        vcc: power @8
+    }
+    symbol: op_amp
+    units {
+        A {
+            pins: {
+                inp: inp_a
+                inm: inm_a
+                out: out_a
+                vcc: vcc
+                vee: gnd
+            }
+            symbol: op_amp
+        }
+        B {
+            pins: {
+                inp: inp_b
+                inm: inm_b
+                out: out_b
+            }
+            symbol: op_amp
+        }
+    }
+}
+
+part Resistor {
+    pins {
+        p1: passive @1
+        p2: passive @2
+    }
+    symbol: two_terminal
+}
+
+module DualInverter {
+    instances {
+        U1: LM358
+        R_IN_A: Resistor place: (-22, 10)
+        R_FB_A: Resistor place: (-13, 7) rot: 180
+        R_IN_B: Resistor place: (6, -12)
+        R_FB_B: Resistor place: (12, -15) rot: 180
+    }
+    connections {
+        // Channel A: inverting amplifier.
+        R_IN_A.p2 -> U1.inm_a
+        U1.out_a -> R_FB_A.p1
+        R_FB_A.p2 -> U1.inm_a
+
+        // Channel B: identical, independent gate.
+        R_IN_B.p2 -> U1.inm_b
+        U1.out_b -> R_FB_B.p1
+        R_FB_B.p2 -> U1.inm_b
+    }
+}
