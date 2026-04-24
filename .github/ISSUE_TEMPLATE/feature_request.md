@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Suggest a new feature for Aelm
+about: Suggest a new feature for AELM
 title: "[Feature] "
 labels: enhancement
 ---

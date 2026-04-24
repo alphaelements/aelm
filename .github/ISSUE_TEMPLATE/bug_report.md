@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Report a bug in Aelm
+about: Report a bug in AELM
 title: "[Bug] "
 labels: bug
 ---
@@ -25,7 +25,7 @@ What actually happened.
 
 ## Environment
 
-- Aelm version: [e.g. 0.1.0]
+- AELM version: [e.g. 0.1.0]
 - VS Code version: [e.g. 1.96.0]
 - OS: [e.g. Windows 11, macOS 15, Ubuntu 24.04]
 
