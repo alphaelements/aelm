@@ -1,0 +1,40 @@
+// Phase 4.5-H mixed-hierarchy example (Issue #164).
+//
+// Demonstrates that `part`, `block(...)`, and `flow_node(...)` can
+// coexist in the same module. This is the capstone sample for the
+// Phase 4.5 middle batch (#160, #162, #163, #164).
+
+part Resistor {
+    pins {
+        a: passive @1
+        b: passive @2
+    }
+    symbol: resistor
+}
+
+module MixedHierarchy {
+    stereotype: block_diagram
+
+    instances {
+        // Classic circuit part
+        R1: Resistor place: (0, -1)
+
+        // Block-diagram abstract shapes (#163)
+        MCU:  block(shape: rect,          label: "MCU") place: (-2, 8)
+        MEM:  block(shape: rounded_rect,  label: "Memory") place: (4, 8)
+        BUS:  block(shape: hexagon,       label: "Bus") place: (12, 8)
+
+        // Flow-chart nodes (#164)
+        BOOT: flow_node(shape: start,   label: "Boot") place: (-2, 4)
+        INIT: flow_node(shape: process, label: "Init Peripherals") place: (4, 4)
+        IDLE: flow_node(shape: end,     label: "Idle Loop") place: (11, 4)
+    }
+
+    connections {
+        R1.a -> R1.b
+    }
+
+    flow {
+        BOOT -> INIT -> IDLE
+    }
+}

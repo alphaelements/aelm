@@ -1,0 +1,36 @@
+// Phase 4.5-H flow-chart example (Issue #164, re-authored under #168).
+//
+// Illustrates a typical power-on sequence rendered as a flow chart.
+// Each node is a `flow_node(...)` primitive picked from the BD-SYM-012
+// vocabulary; connections are authored with the `->` operator inside
+// a `flow {}` block.
+//
+// #170 placement hints: the retry branch (WAIT -> SELFTEST) is placed to
+// the LEFT of the main column so the back-edge runs around the diagram
+// instead of slicing through the pass branch. See BD-VSCode-InteractiveCore
+// §5.1 for the contract.
+
+module PowerOnFlow {
+    stereotype: flow_chart
+
+    instances {
+        // Main column — pass branch flows straight down.
+        START:    flow_node(shape: start,      label: "Power On")       place: (5, 0)
+        SELFTEST: flow_node(shape: process,    label: "Self-Test")      place: START.out(0, 4)
+        OK:       flow_node(shape: decision,   label: "Pass?")          place: SELFTEST.out(0, 4)
+        LOAD:     flow_node(shape: subprocess, label: "Load Firmware")  place: OK.out(0, 4)
+        RUN:      flow_node(shape: io,         label: "Run User App")   place: LOAD.out(0, 4)
+        DONE:     flow_node(shape: end,        label: "Done")           place: RUN.out(0, 4)
+
+        // Retry branch — LOGERR and WAIT live in a left-side column so the
+        // WAIT -> SELFTEST back-edge routes around the main flow.
+        LOGERR:   flow_node(shape: document,   label: "Log Error")      place: OK.out(-6, 0)
+        WAIT:     flow_node(shape: delay,      label: "Wait 5s")        place: SELFTEST.out(-6, 0)
+    }
+
+    flow {
+        START -> SELFTEST -> OK
+        OK ->{yes} LOAD -> RUN -> DONE
+        OK ->{no} LOGERR -> WAIT -> SELFTEST
+    }
+}

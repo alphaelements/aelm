@@ -1,0 +1,27 @@
+// Consumer circuit for the external vendor library.
+//
+// The `use "vendor.alib"` below is NOT file-adjacent and NOT in the
+// stdlib — it only resolves because demo.aproj registers
+// ./vendor_symbols in its `libraries {}` block (#134-P1).
+//
+// The imported parts reference custom geometry declared with the
+// `symbol {}` DSL (#134-P2), so this file fails to render if either
+// Phase regresses.
+use "vendor.alib"
+
+module VendorBoard {
+    ports {
+        VCC: power inout
+        GND: passive inout
+    }
+    instances {
+        R1: VendorResistorPart place: (7, 3)
+        C1: VendorCapacitorPart place: (-10, 0)
+    }
+    connections {
+        VCC -> R1.p1
+        R1.p2 -> GND
+        VCC -> C1.p1
+        C1.p2 -> GND
+    }
+}

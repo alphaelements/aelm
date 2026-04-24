@@ -1,0 +1,12 @@
+project {
+    name: "external-library-demo"
+    version: "0.1.0"
+
+    // Issue #134-P1: register an external library directory so that
+    // `use "custom_parts.alib"` in demo.aelm resolves without any
+    // `-L` CLI flag. Paths are relative to the directory of this
+    // .aproj file.
+    libraries {
+        demo: { path: "./mylib" }
+    }
+}

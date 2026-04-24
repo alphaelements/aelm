@@ -1,0 +1,132 @@
+// Phase 4.5-G block diagram symbol gallery (Issue #163)
+//
+// Showcases all 19 block-diagram symbols:
+//   - BD-SYM-011 basic shapes    (6): block_rect, block_rounded_rect,
+//                                     block_circle, block_hexagon,
+//                                     block_cloud, block_parallelogram
+//   - BD-SYM-013 stereotypes     (9): actor, database, cylinder, queue,
+//                                     antenna, display_monitor, sensor,
+//                                     server, storage_disk
+//   - BD-SYM-014 signal sources  (4): oscillator_block, signal_generator,
+//                                     clock_source, noise_source
+//
+// All symbols except `antenna` are pin-less; the antenna part exposes a
+// single upward `feed` pin. Connections between blocks in a real diagram
+// would be authored via flow {} edges (#164) or bundle edges (#160); this
+// gallery simply arranges one instance of each symbol for visual review.
+
+// ── BD-SYM-011 basic shapes ────────────────────────────────────────────────
+
+part BlockRect {
+    symbol: block_rect
+}
+
+part BlockRoundedRect {
+    symbol: block_rounded_rect
+}
+
+part BlockCircle {
+    symbol: block_circle
+}
+
+part BlockHexagon {
+    symbol: block_hexagon
+}
+
+part BlockCloud {
+    symbol: block_cloud
+}
+
+part BlockParallelogram {
+    symbol: block_parallelogram
+}
+
+// ── BD-SYM-013 stereotypes ─────────────────────────────────────────────────
+
+part Actor {
+    symbol: actor
+}
+
+part Database {
+    symbol: database
+}
+
+part Cylinder {
+    symbol: cylinder
+}
+
+part Queue {
+    symbol: queue
+}
+
+part Antenna {
+    pins {
+        feed: no_connect @1
+    }
+    symbol: antenna
+}
+
+part DisplayMonitor {
+    symbol: display_monitor
+}
+
+part Sensor {
+    symbol: sensor
+}
+
+part Server {
+    symbol: server
+}
+
+part StorageDisk {
+    symbol: storage_disk
+}
+
+// ── BD-SYM-014 signal sources ──────────────────────────────────────────────
+
+part OscillatorBlock {
+    symbol: oscillator_block
+}
+
+part SignalGenerator {
+    symbol: signal_generator
+}
+
+part ClockSource {
+    symbol: clock_source
+}
+
+part NoiseSource {
+    symbol: noise_source
+}
+
+// ── Gallery module ─────────────────────────────────────────────────────────
+
+module BlockGallery {
+    instances {
+        // Basic shapes (row 1)
+        RECT:       BlockRect
+        ROUNDED:    BlockRoundedRect
+        CIRCLE:     BlockCircle
+        HEX:        BlockHexagon
+        CLOUD:      BlockCloud
+        PARALLEL:   BlockParallelogram
+
+        // Stereotypes (rows 2-3)
+        ACTOR:      Actor
+        DB:         Database
+        CYL:        Cylinder
+        QUEUE:      Queue
+        ANT:        Antenna
+        MON:        DisplayMonitor
+        SENS:       Sensor
+        SRV:        Server
+        DISK:       StorageDisk
+
+        // Signal sources (row 4)
+        OSC:        OscillatorBlock
+        GEN:        SignalGenerator
+        CLK:        ClockSource
+        NOISE:      NoiseSource
+    }
+}

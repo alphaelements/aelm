@@ -1,0 +1,68 @@
+// External-library demo that exercises both #134-P1 (library paths +
+// `library {}` metadata) and #134-P2 (custom `symbol {}` DSL).
+//
+// Nothing in this file is in the default search path, so it only
+// resolves when the consumer registers ./vendor_symbols via one of:
+//   - `.aproj` `libraries { vendor: { path: "./vendor_symbols" } }`
+//   - CLI `aelm <cmd> -L ./vendor_symbols ...`
+//   - `AELM_LIBRARY_PATH=./vendor_symbols aelm ...`
+library {
+    name: "@demo/vendor-symbols"
+    version: "0.2.0"
+    license: "MIT"
+    authors: ["AELM Demo"]
+    aelm_version: ">=0.5.0"
+}
+
+// A zig-zag resistor drawn entirely with the 7 DrawCommand primitives.
+// Pin direction is inward (toward the body); position marks the stub
+// tip where wires attach. stub_endpoint = position + direction × pin_length
+// must land on the integer grid (E_SYM_003). Pin position is included
+// inside the drawing bbox so W_SYM_001 is clean.
+symbol VendorZigResistor {
+    pins {
+        p1: (-2, 0) direction: left pin_length: 1.0
+        p2: (2, 0) direction: right pin_length: 1.0
+    }
+    draw {
+        line (-2, 0) -> (-1, 0)
+        line (-1, 0) -> (-0.8, 0.3)
+        line (-0.8, 0.3) -> (-0.4, -0.3)
+        line (-0.4, -0.3) -> (0, 0.3)
+        line (0, 0.3) -> (0.4, -0.3)
+        line (0.4, -0.3) -> (0.8, 0.3)
+        line (0.8, 0.3) -> (1, 0)
+        line (1, 0) -> (2, 0)
+    }
+    label_anchor: (0, -0.7) anchor: center
+}
+
+// A box-shaped capacitor so the test exercises more than one custom
+// symbol per external library.
+symbol VendorBoxCapacitor {
+    pins {
+        p1: (-2, 0) direction: left pin_length: 1.0
+        p2: (2, 0) direction: right pin_length: 1.0
+    }
+    draw {
+        rect (-1, -0.5) width 2 height 1
+        line (-2, 0) -> (-1, 0)
+        line (1, 0) -> (2, 0)
+    }
+}
+
+part VendorResistorPart {
+    pins {
+        p1: passive @1
+        p2: passive @2
+    }
+    symbol: VendorZigResistor
+}
+
+part VendorCapacitorPart {
+    pins {
+        p1: passive @1
+        p2: passive @2
+    }
+    symbol: VendorBoxCapacitor
+}

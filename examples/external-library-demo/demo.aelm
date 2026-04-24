@@ -1,0 +1,16 @@
+// Imports parts from the external library declared in demo.aproj
+// (and/or via `aelm check --library-dir ./mylib demo.aelm`, and/or via
+// `AELM_LIBRARY_PATH=./mylib aelm check demo.aelm`).
+use "custom_parts.alib"
+
+module Top {
+    instances {
+        R1: WidgetResistor(resistance: 10k)
+        C1: WidgetCapacitor(capacitance: 100n)
+    }
+
+    connections {
+        R1.a -> C1.p
+        R1.b -> C1.n
+    }
+}

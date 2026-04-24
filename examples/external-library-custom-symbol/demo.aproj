@@ -1,0 +1,11 @@
+project {
+    name: "external-library-custom-symbol"
+    version: "0.1.0"
+
+    // #134-P1: register ./vendor_symbols so that `use "vendor.alib"`
+    // in demo.aelm resolves without a CLI flag. Paths are relative
+    // to the directory of this .aproj file.
+    libraries {
+        vendor: { path: "./vendor_symbols" }
+    }
+}

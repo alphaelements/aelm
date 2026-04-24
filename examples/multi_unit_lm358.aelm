@@ -1,7 +1,6 @@
 // Dual op-amp (LM358) wired as two independent inverting amplifiers
-// (Issue #122, #123, #136). Demonstrates the explicit `pins: { sym: part }`
-// mapping form so each part pin lands at the correct `op_amp` symbol pin
-// regardless of pad numbering.
+// (Issue #122, #123, #136, #138, #139). Demonstrates the three-unit
+// `A + B + PWR` layout: two signal gates plus a dedicated power block.
 
 part LM358 {
     pins {
@@ -14,17 +13,15 @@ part LM358 {
         out_b: output @7
         vcc: power @8
     }
-    symbol: op_amp
+    symbol: ic(left: 4, right: 4)
     units {
         A {
             pins: {
                 inp: inp_a
                 inm: inm_a
                 out: out_a
-                vcc: vcc
-                vee: gnd
             }
-            symbol: op_amp
+            symbol: op_amp_signal
         }
         B {
             pins: {
@@ -32,7 +29,14 @@ part LM358 {
                 inm: inm_b
                 out: out_b
             }
-            symbol: op_amp
+            symbol: op_amp_signal
+        }
+        _PWR {
+            pins: {
+                vcc: vcc
+                vee: gnd
+            }
+            symbol: op_amp_power
         }
     }
 }
@@ -42,24 +46,31 @@ part Resistor {
         p1: passive @1
         p2: passive @2
     }
-    symbol: two_terminal
+    symbol: resistor
 }
 
 module DualInverter {
     instances {
-        U1: LM358
-        R_IN_A: Resistor place: (-22, 10)
-        R_FB_A: Resistor place: (-13, 7) rot: 180
-        R_IN_B: Resistor place: (6, -12)
-        R_FB_B: Resistor place: (12, -15) rot: 180
+        // Per-unit placement overrides (#137): position each of U1's three
+        // unit symbols (A, B, _PWR) independently. Units not listed inherit
+        // the parent hints.
+        U1: LM358 expand: true {
+            A: place: (-18, -3)
+            B: place: (-18, 10)
+            _PWR: place: (-21, 3)
+        }
+        R_IN_A: Resistor place: (-24, -1)
+        R_FB_A: Resistor place: (-21, -5) mirror: horizontal
+        R_IN_B: Resistor
+        R_FB_B: Resistor
     }
     connections {
-        // Channel A: inverting amplifier.
+        // Channel A inverting amplifier.
         R_IN_A.p2 -> U1.inm_a
         U1.out_a -> R_FB_A.p1
         R_FB_A.p2 -> U1.inm_a
 
-        // Channel B: identical, independent gate.
+        // Channel B inverting amplifier.
         R_IN_B.p2 -> U1.inm_b
         U1.out_b -> R_FB_B.p1
         R_FB_B.p2 -> U1.inm_b

@@ -1,0 +1,215 @@
+// Custom-symbol smoke library (BD-Symbol-Authoring / Issue #134-P2).
+//
+// Each `symbol {}` block re-implements a geometry equivalent to a built-in so
+// the CLI pipeline can render them end-to-end. The `part` definitions right
+// below bind them to concrete electrical signatures so downstream smoke.aelm
+// can instance them with `use "smoke.alib"`.
+//
+// Pin convention: outward PinDirection; body-edge pin position at ±0.5; a
+// `pin_length: 0.5` stub lands the wire on the integer grid (§4.1).
+//
+// Draw commands are authored to *include* the body-edge points so W_SYM_001
+// (pin outside drawing bbox) does not fire.
+
+// ── 10 パーツ再実装 ─────────────────────────────────────
+
+symbol MyResistor {
+    pins {
+        p1: (-0.5, 0) direction: left pin_length: 0.5
+        p2: (0.5, 0) direction: right pin_length: 0.5
+    }
+    draw {
+        polyline (-0.5, 0) (-0.417, 0.25) (-0.25, -0.25) (-0.083, 0.25) (0.083, -0.25) (0.25, 0.25) (0.417, -0.25) (0.5, 0)
+    }
+}
+
+symbol MyCapacitor {
+    pins {
+        p1: (-0.5, 0) direction: left pin_length: 0.5
+        p2: (0.5, 0) direction: right pin_length: 0.5
+    }
+    draw {
+        line (-0.5, 0) -> (-0.15, 0)
+        line (0.15, 0) -> (0.5, 0)
+        line (-0.15, -0.4) -> (-0.15, 0.4)
+        line (0.15, -0.4) -> (0.15, 0.4)
+    }
+}
+
+symbol MyInductor {
+    pins {
+        p1: (-0.5, 0) direction: left pin_length: 0.5
+        p2: (0.5, 0) direction: right pin_length: 0.5
+    }
+    draw {
+        arc center (-0.375, 0) radius 0.125 start 0 sweep 180
+        arc center (-0.125, 0) radius 0.125 start 0 sweep 180
+        arc center (0.125, 0) radius 0.125 start 0 sweep 180
+        arc center (0.375, 0) radius 0.125 start 0 sweep 180
+        line (-0.5, 0) -> (0.5, 0)
+    }
+}
+
+symbol MyDiode {
+    pins {
+        p1: (-0.5, 0) direction: left pin_length: 0.5
+        p2: (0.5, 0) direction: right pin_length: 0.5
+    }
+    draw {
+        line (-0.5, 0) -> (0.5, 0)
+        filled_polygon (-0.3, -0.3) (-0.3, 0.3) (0.3, 0)
+        line (0.3, -0.3) -> (0.3, 0.3)
+    }
+}
+
+symbol MyLed {
+    pins {
+        p1: (-0.5, 0) direction: left pin_length: 0.5
+        p2: (0.5, 0) direction: right pin_length: 0.5
+    }
+    draw {
+        line (-0.5, 0) -> (0.5, 0)
+        filled_polygon (-0.3, -0.3) (-0.3, 0.3) (0.3, 0)
+        line (0.3, -0.3) -> (0.3, 0.3)
+    }
+}
+
+symbol MyCrystal {
+    pins {
+        p1: (-0.5, 0) direction: left pin_length: 0.5
+        p2: (0.5, 0) direction: right pin_length: 0.5
+    }
+    draw {
+        line (-0.5, 0) -> (-0.2, 0)
+        line (0.2, 0) -> (0.5, 0)
+        line (-0.2, -0.4) -> (-0.2, 0.4)
+        line (0.2, -0.4) -> (0.2, 0.4)
+        rect (-0.15, -0.3) width 0.3 height 0.6
+    }
+}
+
+symbol MyFlag {
+    pins {
+        p: (0, 0.5) direction: down pin_length: 0.5
+    }
+    draw {
+        line (-0.4, 0) -> (0.4, 0)
+        line (-0.4, 0) -> (0, 0.5)
+        line (0.4, 0) -> (0, 0.5)
+    }
+}
+
+symbol MyBox2 {
+    // Rectangular two-pin block — useful for any opaque part.
+    pins {
+        in: (-0.5, 0) direction: left pin_length: 0.5
+        out: (0.5, 0) direction: right pin_length: 0.5
+    }
+    draw {
+        rect (-0.5, -0.5) width 1 height 1
+        text "BOX" at (0, 0) size 0.3 anchor center
+    }
+}
+
+symbol MyTerminal {
+    // Single-pin test point.
+    pins {
+        t: (0, -0.5) direction: up pin_length: 0.5
+    }
+    draw {
+        circle center (0, -0.25) radius 0.25
+        line (-0.15, -0.4) -> (0.15, -0.1)
+    }
+}
+
+symbol MyArrow {
+    // Signal-flow arrow — two small-body pins.
+    pins {
+        a: (-0.5, 0) direction: left pin_length: 0.5
+        b: (0.5, 0) direction: right pin_length: 0.5
+    }
+    draw {
+        line (-0.5, 0) -> (0.25, 0)
+        filled_polygon (0.25, -0.2) (0.25, 0.2) (0.5, 0)
+    }
+}
+
+// ── Part definitions (bind symbols to electrical signatures) ─────────
+
+part MyResistorPart {
+    pins {
+        p1: passive @1
+        p2: passive @2
+    }
+    symbol: MyResistor
+}
+
+part MyCapacitorPart {
+    pins {
+        p1: passive @1
+        p2: passive @2
+    }
+    symbol: MyCapacitor
+}
+
+part MyInductorPart {
+    pins {
+        p1: passive @1
+        p2: passive @2
+    }
+    symbol: MyInductor
+}
+
+part MyDiodePart {
+    pins {
+        a: passive @1
+        k: passive @2
+    }
+    symbol: MyDiode
+}
+
+part MyLedPart {
+    pins {
+        a: passive @1
+        k: passive @2
+    }
+    symbol: MyLed
+}
+
+part MyCrystalPart {
+    pins {
+        p1: passive @1
+        p2: passive @2
+    }
+    symbol: MyCrystal
+}
+
+part MyFlagPart {
+    pins {
+        p: power @1
+    }
+    symbol: MyFlag
+}
+
+part MyBox2Part {
+    pins {
+        in: input @1
+        out: output @2
+    }
+    symbol: MyBox2
+}
+
+part MyTerminalPart {
+    pins {
+        t: passive @1
+    }
+    symbol: MyTerminal
+}
+
+part MyArrowPart {
+    pins {
+        a: passive @1
+        b: passive @2
+    }
+    symbol: MyArrow
+}

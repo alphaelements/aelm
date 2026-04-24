@@ -1,6 +1,6 @@
-# Aelm — Agent-native Electronic Layout Markup
+# AELM — Agent-native Electronic Layout Markup
 
-Aelm is a text-based electronic circuit CAD tool that runs as a VSCode extension powered by Rust and WebAssembly. Define circuits using a dedicated DSL, render schematics automatically, and manage your designs with version control.
+AELM is a text-based electronic circuit CAD tool that runs as a VSCode extension powered by Rust and WebAssembly. Define circuits using a dedicated DSL, render schematics automatically, and manage your designs with version control.
 
 ## Repository Structure
 

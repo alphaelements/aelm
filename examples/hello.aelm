@@ -1,4 +1,4 @@
-// Hello Aelm — minimal circuit for testing
+// Hello AELM — minimal circuit for testing
 part Resistor {
     pins {
         a: passive @1

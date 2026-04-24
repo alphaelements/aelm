@@ -1,0 +1,53 @@
+// Smoke test for the 10-part custom-symbol library (Issue #134-P2).
+// Each part connects only between VCC and GND so that routing is trivial
+// and the test remains deterministic regardless of force-layout seeding.
+
+use "smoke.alib"
+
+module SmokeBoard {
+    ports {
+        VCC: power inout
+        GND: passive inout
+    }
+    instances {
+        R1:    MyResistorPart place: (30, -1)
+        C1:    MyCapacitorPart
+        L1:    MyInductorPart
+        D1:    MyDiodePart
+        LED1:  MyLedPart
+        Y1:    MyCrystalPart
+        VCCF:  MyFlagPart
+        BOX1:  MyBox2Part
+        T1:    MyTerminalPart
+        ARR1:  MyArrowPart
+    }
+    connections {
+        VCC -> R1.p1
+        R1.p2 -> GND
+
+        VCC -> C1.p1
+        C1.p2 -> GND
+
+        VCC -> L1.p1
+        L1.p2 -> GND
+
+        VCC -> D1.a
+        D1.k -> GND
+
+        VCC -> LED1.a
+        LED1.k -> GND
+
+        VCC -> Y1.p1
+        Y1.p2 -> GND
+
+        VCC -> BOX1.in
+        BOX1.out -> GND
+
+        VCC -> ARR1.a
+        ARR1.b -> GND
+
+        VCC -> T1.t
+
+        VCCF.p -> VCC
+    }
+}

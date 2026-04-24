@@ -1,0 +1,39 @@
+library {
+    name: "demo-custom-parts"
+    version: "0.1.0"
+    license: "MIT"
+    authors: ["AELM Demo"]
+    aelm_version: ">=0.5.0"
+}
+
+// A couple of part definitions that reuse built-in symbols; the goal of
+// this demo is to exercise the `use "..."` path resolution, not to add
+// new symbol templates (that lands in Issue #134-P2).
+
+part WidgetResistor {
+    params {
+        resistance: Ohm
+    }
+    pins {
+        a: passive @1
+        b: passive @2
+    }
+    symbol: resistor
+    footprints {
+        default: "0603"
+    }
+}
+
+part WidgetCapacitor {
+    params {
+        capacitance: Farad
+    }
+    pins {
+        p: passive @1
+        n: passive @2
+    }
+    symbol: capacitor
+    footprints {
+        default: "0402"
+    }
+}
