@@ -1,0 +1,62 @@
+# aelm-version: 0.2.1
+// Measurement instrument gallery — Phase 4.5-A / #158
+// Showcases the five measurement symbols added in stdlib/parts/measurement.alib.
+//
+// Part definitions are inlined here so the example is self-contained and the
+// CLI can export it without an .aproj. The actual stdlib library lives at
+// stdlib/parts/measurement.alib.
+
+part Voltmeter {
+    pins {
+        p1: passive @1
+        p2: passive @2
+    }
+    symbol: voltmeter
+}
+
+part Ammeter {
+    pins {
+        p1: passive @1
+        p2: passive @2
+    }
+    symbol: ammeter
+}
+
+part Ohmmeter {
+    pins {
+        p1: passive @1
+        p2: passive @2
+    }
+    symbol: ohmmeter
+}
+
+part ScopeProbe {
+    pins {
+        tip: passive @1
+        gnd: passive @2
+    }
+    symbol: oscilloscope_probe
+}
+
+part TestPoint {
+    pins {
+        pin: passive @1
+    }
+    symbol: test_point
+}
+
+module MeasurementGallery {
+    instances {
+        VM:  Voltmeter   place: (4, 4)
+        AM:  Ammeter     place: VM.p2(4, 0)
+        OM:  Ohmmeter    place: AM.p2(4, 0)
+        SP:  ScopeProbe  place: VM.p1(0, 6)
+        TP:  TestPoint   place: SP.gnd(2, 4)
+    }
+    connections {
+        VM.p2 -> AM.p1
+        AM.p2 -> OM.p1
+        SP.tip -> AM.p1
+        SP.gnd -> TP.pin
+    }
+}

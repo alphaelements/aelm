@@ -1,0 +1,81 @@
+# aelm-version: 0.2.1
+// Ideal-element gallery — Phase 4.5-C / #159
+// Showcases all 19 ideal elements added across switches / optical / thermal /
+// transducer / antenna. Part definitions are inlined so the gallery exports
+// without an .aproj.
+
+// ── Switches & relays ─────────────────────────────────────────
+part SwSPST { pins { p1: passive @1 p2: passive @2 } symbol: switch_spst }
+part SwSPDT { pins { p1: passive @1 p2: passive @2 p3: passive @3 } symbol: switch_spdt }
+part SwDPDT {
+    pins {
+        p1: passive @1
+        p2: passive @2
+        p3: passive @3
+        p4: passive @4
+        p5: passive @5
+        p6: passive @6
+    }
+    symbol: switch_dpdt
+}
+part RlyCoil { pins { p1: passive @1 p2: passive @2 } symbol: relay_coil }
+part RlyCtct { pins { p1: passive @1 p2: passive @2 p3: passive @3 } symbol: relay_contact }
+
+// ── Optical ───────────────────────────────────────────────────
+part PhotoD { pins { a: passive @1 k: passive @2 } symbol: photodiode }
+part PhotoT { pins { c: output @1 e: passive @2 } symbol: phototransistor }
+part Optoc {
+    pins {
+        a: passive @1
+        k: passive @2
+        c: passive @3
+        e: passive @4
+    }
+    symbol: optocoupler
+}
+
+// ── Thermal ───────────────────────────────────────────────────
+part TherNTC { pins { p1: passive @1 p2: passive @2 } symbol: thermistor_ntc }
+part TherPTC { pins { p1: passive @1 p2: passive @2 } symbol: thermistor_ptc }
+part TherCpl { pins { p1: passive @1 p2: passive @2 } symbol: thermocouple }
+
+// ── Transducers ───────────────────────────────────────────────
+part MotDC { pins { p1: passive @1 p2: passive @2 } symbol: motor_dc }
+part MotAC { pins { p1: passive @1 p2: passive @2 } symbol: motor_ac }
+part Spk { pins { p1: passive @1 p2: passive @2 } symbol: speaker }
+part Buz { pins { p1: passive @1 p2: passive @2 } symbol: buzzer }
+part Mic { pins { p1: passive @1 p2: passive @2 } symbol: microphone }
+
+// ── Antennas ──────────────────────────────────────────────────
+part AntMono { pins { feed: passive @1 } symbol: antenna_monopole }
+part AntDip { pins { feed_p: passive @1 feed_n: passive @2 } symbol: antenna_dipole }
+part AntLoop { pins { p1: passive @1 p2: passive @2 } symbol: antenna_loop }
+
+module IdealElementsGallery {
+    instances {
+        // Row 1: switches & relays
+        E_SPST: SwSPST   place: (4, 4)
+        E_SPDT: SwSPDT   place: E_SPST.p2(4, 0)
+        E_DPDT: SwDPDT   place: E_SPDT.p2(4, 0)
+        E_RC:   RlyCoil  place: E_DPDT.p2(5, 0)
+        E_RCT:  RlyCtct  place: E_RC.p2(4, 0)
+        // Row 2: optical
+        E_PD:   PhotoD   place: E_SPST.p1(0, 6)
+        E_PT:   PhotoT   place: E_PD.k(4, 0)
+        E_OPT:  Optoc    place: E_PT.c(4, 2)
+        // Row 3: thermal
+        E_NTC:  TherNTC  place: E_PD.a(0, 6)
+        E_PTC:  TherPTC  place: E_NTC.p2(4, 0)
+        E_TC:   TherCpl  place: E_PTC.p2(4, 0)
+        // Row 4: transducers
+        E_MDC:  MotDC    place: E_NTC.p1(0, 6)
+        E_MAC:  MotAC    place: E_MDC.p2(4, 0)
+        E_SPK:  Spk      place: E_MAC.p2(4, 0)
+        E_BUZ:  Buz      place: E_SPK.p2(4, 0)
+        E_MIC:  Mic      place: E_BUZ.p2(4, 0)
+        // Row 5: antennas
+        E_AM:   AntMono  place: E_MDC.p1(0, 6)
+        E_AD:   AntDip   place: E_AM.feed(4, 0)
+        E_AL:   AntLoop  place: E_AD.feed_p(4, 0)
+    }
+}

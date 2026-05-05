@@ -1,0 +1,23 @@
+# aelm-version: 0.2.1
+// Demonstrates IC parts in ic.alib.
+
+use "ic.alib"
+
+module ICGallery {
+    instances {
+        // ── Row 1: op-amps and regulator ────────────────────────────
+        U1: OpAmp place: (0, 0)
+        U2: OpAmpSignal place: U1.out(6, 0)
+        U3: OpAmpPower place: U2.OUT(6, 0)
+        U4: Regulator3Pin(output_voltage: 3.3) place: U3.VCC(6, 0)
+
+        // ── Row 2: rectangular 2-side ICs (auto-width via ic(left:N, right:M)) ──
+        U5: Timer555 place: (0, -10)
+        U6: Logic74HC00 place: U5.vcc(8, 0)
+        U7: ATmega328P place: U6.vcc(10, 0)
+
+        // ── Row 3: rectangular 4-side ICs (auto-sized via ic(left,right,top,bottom)) ──
+        U8: STM32F103C8 place: (1, -34)
+        U9: RP2350A place: U8.vdd_2(23, 4)
+    }
+}

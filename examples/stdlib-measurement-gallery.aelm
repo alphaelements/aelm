@@ -1,0 +1,19 @@
+# aelm-version: 0.2.1
+// Demonstrates all measurement parts in measurement.alib.
+
+use "measurement.alib"
+
+module MeasurementGallery {
+    instances {
+        // Test point (single pin) at origin
+        TP1: TestPoint place: (0, 0) nc: all
+
+        // Scope probe to the right
+        PR1: ScopeProbe place: TP1.pin(5, 0) nc: all
+
+        // Meters: ammeter, voltmeter, ohmmeter
+        AM1: Ammeter place: PR1.tip(5, 0) nc: all
+        VM1: Voltmeter place: AM1.p2(5, 0) nc: all
+        OM1: Ohmmeter place: VM1.p2(5, 0) nc: all
+    }
+}

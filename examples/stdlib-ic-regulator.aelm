@@ -1,0 +1,18 @@
+# aelm-version: 0.2.1
+// Demonstrates the 3-terminal linear voltage regulator (LM78xx-style).
+
+use "ic.alib"
+use "passive.alib"
+
+module RegulatorDemo {
+    instances {
+        // LM7805-style: 5V output
+        U1: Regulator3Pin(output_voltage: 5.0) place: (0, 0)
+
+        // Input bypass cap
+        CIN: Capacitor(value: 100n) place: U1.vin(-4, 0)
+
+        // Output bypass cap
+        COUT: Capacitor(value: 10u) place: U1.vout(4, 0)
+    }
+}

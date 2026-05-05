@@ -1,0 +1,17 @@
+# aelm-version: 0.2.1
+// Demonstrates all antenna parts in antenna.alib.
+
+use "antenna.alib"
+
+module AntennaGallery {
+    instances {
+        // Key anchor: monopole at origin
+        ANT1: AntennaMonopole place: (0, 0) nc: all
+
+        // Dipole to the right (two feed pins)
+        ANT2: AntennaDipole place: (5, 0) nc: all
+
+        // Loop antenna to the right
+        ANT3: AntennaLoop place: (10, 0) nc: all
+    }
+}

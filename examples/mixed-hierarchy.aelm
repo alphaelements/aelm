@@ -1,3 +1,4 @@
+# aelm-version: 0.2.1
 // Phase 4.5-H mixed-hierarchy example (Issue #164).
 //
 // Demonstrates that `part`, `block(...)`, and `flow_node(...)` can

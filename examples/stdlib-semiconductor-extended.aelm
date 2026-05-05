@@ -1,0 +1,33 @@
+# aelm-version: 0.2.1
+// Demonstrates all semiconductor parts in semiconductor.alib.
+
+use "semiconductor.alib"
+
+module SemiconductorGallery {
+    instances {
+        // ── Row 1: diodes ───────────────────────────────────────────
+        D1: Diode place: (0, 0)
+        D2: LED place: D1.k(5, 0)
+        D3: Zener(voltage: 3.3) place: D2.k(5, 0)
+        D4: Schottky place: D3.k(5, 0)
+        D5: TVS(voltage: 5.0) place: D4.k(5, 0)
+        D6: Photodiode place: D5.k(5, 0)
+
+        // ── Row 2: BJT & crystal ────────────────────────────────────
+        Q1: NPN place: (0, -6)
+        Q2: PNP place: Q1.c(5, 2)
+        X1: Crystal(frequency: 16M) place: Q2.c(5, -2)
+        Q3: Phototransistor place: X1.p2(5, 0)
+
+        // ── Row 3: MOSFET ───────────────────────────────────────────
+        M1: NMOS place: (0, -12)
+        M2: PMOS place: M1.d(5, 2)
+        M3: NMOS_Enh place: M2.s(5, 2)
+        M4: NMOS_Dep place: M3.d(5, 2)
+        M5: PMOS_Enh place: M4.d(5, 2)
+        M6: PMOS_Dep place: M5.s(5, 2)
+
+        // ── Row 4: optoelectronics ──────────────────────────────────
+        U1: Optocoupler place: (2, -18)
+    }
+}

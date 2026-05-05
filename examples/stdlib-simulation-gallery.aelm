@@ -1,0 +1,18 @@
+# aelm-version: 0.2.1
+// Demonstrates SPICE-style dependent sources in simulation.alib.
+
+use "simulation.alib"
+
+module SimulationGallery {
+    instances {
+        // Key anchor: VCVS at origin
+        E1: VCVS(gain: 1.0) place: (0, 0) nc: all
+
+        // VCCS to the right
+        G1: VCCS(transconductance: 1.0) place: E1.out_p(6, 1) nc: all
+
+        // CCVS and CCCS below
+        H1: CCVS(transresistance: 1.0) place: (0, -6) nc: all
+        F1: CCCS(gain: 1.0) place: H1.out_p(6, 1) nc: all
+    }
+}

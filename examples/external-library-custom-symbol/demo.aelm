@@ -1,3 +1,4 @@
+# aelm-version: 0.2.1
 // Consumer circuit for the external vendor library.
 //
 // The `use "vendor.alib"` below is NOT file-adjacent and NOT in the

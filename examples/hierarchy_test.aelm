@@ -1,3 +1,4 @@
+# aelm-version: 0.2.1
 // Hierarchy test: module-as-instance
 // Tests that modules can be instantiated as sub-circuits
 

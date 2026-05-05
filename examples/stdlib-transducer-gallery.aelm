@@ -1,0 +1,17 @@
+# aelm-version: 0.2.1
+// Demonstrates all transducer parts in transducer.alib.
+
+use "transducer.alib"
+
+module TransducerGallery {
+    instances {
+        // Key anchor: DC motor at origin
+        M1: MotorDC place: (0, 0) nc: all
+        M2: MotorAC place: M1.p2(6, 0) nc: all
+
+        // Audio transducers
+        LS1: Speaker place: (0, 6) nc: all
+        BZ1: Buzzer place: LS1.p2(6, 0) nc: all
+        MIC1: Microphone place: BZ1.p2(6, 0) nc: all
+    }
+}

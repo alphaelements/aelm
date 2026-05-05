@@ -1,3 +1,4 @@
+# aelm-version: 0.2.1
 // Dual op-amp (LM358) wired as two independent inverting amplifiers
 // (Issue #122, #123, #136, #138, #139). Demonstrates the three-unit
 // `A + B + PWR` layout: two signal gates plus a dedicated power block.

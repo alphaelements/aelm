@@ -1,0 +1,32 @@
+# aelm-version: 0.2.1
+// Demonstrates all parametric connector sizes (single-row + dual-row).
+
+use "connector.alib"
+
+module ConnectorGallery {
+    instances {
+        // ── Row 1: single-row size variants (1..12 pins) ────────────
+        J1: Connector1 place: (0, 2) nc: all
+        J2: Connector2 place: J1.pin_1(2, 2) nc: all
+        J3: Connector3 place: J2.pin_1(2, 4) nc: all
+        J4: Connector4 place: J3.pin_1(2, 5) nc: all
+        J5: Connector5 place: J4.pin_1(2, 7) nc: all
+        J6: Connector6 place: J5.pin_1(2, 8) nc: all
+        J8: Connector8 place: J6.pin_1(8, -17) nc: all
+        J10: Connector10 place: J8.pin_1(2, 13) nc: all
+        J12: Connector12 place: J10.pin_1(2, 16) nc: all
+
+        // ── Row 2: dual-row size variants (DIP numbering) ────────────
+        J24: Connector2x4 place: (14, 3) nc: all
+        J25: Connector2x5 place: J24.pin_1(3, 8) nc: all
+        J210: Connector2x10 place: J25.pin_1(3, 11) nc: all
+
+        // ── Row 3: dual-row variants with alternating (chidori) numbering ──
+        J24A: Connector2x4Alt place: J210.pin_1(13, -12) nc: all
+        J25A: Connector2x5Alt place: J24A.pin_1(3, 8) nc: all
+        J210A: Connector2x10Alt place: J25A.pin_1(3, 11) nc: all
+    }
+    connections {
+        J5.pin_5 -> J5.pin_4
+    }
+}

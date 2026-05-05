@@ -1,3 +1,4 @@
+# aelm-version: 0.2.1
 // Mirror test: NPN normal vs PNP mirrored horizontally
 part NPN {
     pins {

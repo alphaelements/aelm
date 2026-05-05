@@ -1,0 +1,17 @@
+# aelm-version: 0.2.1
+// Demonstrates all electromechanical parts in electromechanical.alib.
+
+use "electromechanical.alib"
+
+module ElectromechanicalGallery {
+    instances {
+        // Switches (left to right)
+        SW1: SwitchSPST place: (0, 0) nc: all
+        SW2: SwitchSPDT place: SW1.p2(5, 0) nc: all
+        SW3: SwitchDPDT place: SW2.p2(5, 0) nc: all
+
+        // Relay coil and contact below switches
+        K1: RelayCoil place: (0, -6) nc: all
+        K2: RelayContact place: K1.p2(5, 0) nc: all
+    }
+}

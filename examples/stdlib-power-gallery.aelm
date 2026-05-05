@@ -1,0 +1,19 @@
+# aelm-version: 0.2.1
+// Demonstrates power and ground net flag symbols in power.alib.
+// Note: instance name becomes the net label (VCC: PWR → VCC net).
+
+use "power.alib"
+
+module PowerGallery {
+    instances {
+        // Power flags — instance name is the net name
+        VCC: PWR place: (0, 0) nc: all
+        VDD: PWRArrow place: (4, 0) nc: all
+
+        // Ground variants
+        GND1: GND place: (0, 4) nc: all
+        SGND: GNDTriangle place: (4, 4) nc: all
+        EARTH: GNDEarth place: (8, 4) nc: all
+        PE: GNDProtective place: (12, 4) nc: all
+    }
+}

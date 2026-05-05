@@ -1,3 +1,4 @@
+# aelm-version: 0.2.1
 // Style cascade verification circuit
 // Tests: universal (*), type (Resistor, NPN), id (#R1), pseudo-elements
 

@@ -1,3 +1,4 @@
+# aelm-version: 0.2.1
 // Imports parts from the external library declared in demo.aproj
 // (and/or via `aelm check --library-dir ./mylib demo.aelm`, and/or via
 // `AELM_LIBRARY_PATH=./mylib aelm check demo.aelm`).

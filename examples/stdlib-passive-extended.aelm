@@ -1,0 +1,33 @@
+# aelm-version: 0.2.1
+// Demonstrates all passive parts in passive.alib (rows by category).
+
+use "passive.alib"
+
+module PassiveGallery {
+    instances {
+        // ── Row 1: original passive parts ───────────────────────────
+        R1: Resistor(value: 10k) place: (0, 0)
+        RV1: ResistorV(value: 4.7k) place: R1.p2(5, 0)
+        C1: Capacitor(value: 100n) place: RV1.p2(5, 0)
+        CP1: CapacitorP(value: 100u) place: C1.p2(5, 0)
+        L1: Inductor(value: 10u) place: CP1.p2(5, 0)
+        F1: Fuse(rating: 500m) place: L1.p2(5, 0)
+        FB1: FerriteBead(impedance: 100) place: F1.p2(5, 0)
+
+        // ── Row 2: pots, transformer, battery ───────────────────────
+        POT1: Potentiometer(value: 10k) place: (0, -6)
+        T1: Transformer(ratio: 2.0) place: POT1.p2(5, 0)
+        BAT1: Battery(voltage: 9) rot: 90 place: T1.sec1(4, 1)
+
+        // ── Row 3: sources (simulation) ──────────────────────────────
+        VDC1: VoltageSourceDC(voltage: 5.0) place: (0, -12)
+        VAC1: VoltageSourceAC(voltage: 5.0) place: VDC1.p2(5, -1)
+        IDC1: CurrentSourceDC(current: 1) place: VAC1.p2(5, -1)
+        IAC1: CurrentSourceAC(current: 1) place: IDC1.p2(5, -1)
+
+        // ── Row 4: thermal sensors ─────────────────────────────────
+        NTC1: ThermistorNTC(resistance: 10k) place: (0, -18)
+        PTC1: ThermistorPTC(resistance: 100) place: NTC1.p2(5, 0)
+        TC1: Thermocouple place: PTC1.p2(5, 0)
+    }
+}

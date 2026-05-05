@@ -1,0 +1,108 @@
+# aelm-version: 0.2.1
+// Ideal source gallery — Phase 4.5-B / #157
+// Showcases all eight ideal sources added in stdlib/parts/sources.alib.
+// Part definitions are inlined so the gallery exports without an .aproj.
+
+part VDC {
+    params { voltage: Volt = 5.0 }
+    pins {
+        p1: passive @1
+        p2: passive @2
+    }
+    symbol: voltage_source_dc
+}
+
+part VAC {
+    params {
+        amplitude: Volt = 1.0
+        frequency: Hertz = 1k
+    }
+    pins {
+        p1: passive @1
+        p2: passive @2
+    }
+    symbol: voltage_source_ac
+}
+
+part IDC {
+    params { current: Ampere = 1.0 }
+    pins {
+        p1: passive @1
+        p2: passive @2
+    }
+    symbol: current_source_dc
+}
+
+part IAC {
+    params {
+        amplitude: Ampere = 1.0
+        frequency: Hertz = 1k
+    }
+    pins {
+        p1: passive @1
+        p2: passive @2
+    }
+    symbol: current_source_ac
+}
+
+part VCVS {
+    params { gain: Float = 1.0 }
+    pins {
+        ctrl_p: input @1
+        ctrl_n: input @2
+        out_p: output @3
+        out_n: output @4
+    }
+    symbol: vcvs
+}
+
+part VCCS {
+    params { transconductance: Float = 1.0 }
+    pins {
+        ctrl_p: input @1
+        ctrl_n: input @2
+        out_p: output @3
+        out_n: output @4
+    }
+    symbol: vccs
+}
+
+part CCVS {
+    params { transresistance: Float = 1.0 }
+    pins {
+        ctrl_p: input @1
+        ctrl_n: input @2
+        out_p: output @3
+        out_n: output @4
+    }
+    symbol: ccvs
+}
+
+part CCCS {
+    params { gain: Float = 1.0 }
+    pins {
+        ctrl_p: input @1
+        ctrl_n: input @2
+        out_p: output @3
+        out_n: output @4
+    }
+    symbol: cccs
+}
+
+module SourcesGallery {
+    instances {
+        // Independent sources — top row, absolute places keep each symbol on
+        // the same baseline so adjacent labels don't fall into the next
+        // symbol's body.
+        SRC_VDC: VDC  place: (4, 4)
+        SRC_VAC: VAC  place: (12, 4)
+        SRC_IDC: IDC  place: (20, 4)
+        SRC_IAC: IAC  place: (28, 4)
+        // Dependent sources — bottom row. The 4-terminal diamond is wider,
+        // so we space them 10 grid apart (body ±2 + label clearance).
+        SRC_VCVS: VCVS  place: (4,  14)
+        SRC_VCCS: VCCS  place: (14, 14)
+        SRC_CCVS: CCVS  place: (24, 14)
+        SRC_CCCS: CCCS  place: (34, 14)
+    }
+}
