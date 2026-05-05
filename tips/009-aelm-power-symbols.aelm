@@ -1,0 +1,24 @@
+# aelm-version: 0.3.0
+
+// title: AELM Power and Ground Symbols
+// topic: dsl-stdlib
+// tags: #AELM #EDA #DSL #Tutorial #Stdlib
+// hint: Declare rails in `nets {}` (`VCC: power`, `GND: ground`) and drop `<id>: net <NetName>` taps where the rail meets a pin. Every tap labelled `VCC` belongs to the same net, every `GND` likewise — no long cross-page wires needed.
+
+use "passive.alib"
+
+module PowerSymbolDemo {
+    nets {
+        VCC: power  { symbol: power_flag }
+        GND: ground { symbol: gnd_flag }
+    }
+    instances {
+        V1: net VCC                       place: (6, 2)
+        R1: Resistor(value: 1k)           place: V1.pin(0, 3) rot: 90
+        G1: net GND                       place: R1.p2(0, 2)
+    }
+    connections {
+        V1.pin -> R1.p1
+        R1.p2  -> G1.pin
+    }
+}

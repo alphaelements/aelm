@@ -1,0 +1,49 @@
+# aelm-version: 0.3.0
+
+// title: NPN Transistor Low-Side Switch
+// topic: stdlib-parts
+// tags: #AELM #EDA #Transistor #AnalogCircuits #Hobbyist
+// hint: Drive a relay or motor from a low-current MCU GPIO. Rb limits base current; the load sits in the collector. Ic = Ib × hFE governs the on-state current. A foundational block for any actuator interface.
+
+use "passive.alib"
+use "semiconductor.alib"
+use "sources.alib"
+
+module NPNSwitch {
+    // Two notes specific to this tip — placement recipe lives in
+    // tips/001-003:
+    //   - Anchor is `Sig` (the input source), not the active element
+    //     (`Q1`). This circuit is a left-to-right signal-flow demo,
+    //     so starting the placement chain at the signal entry point
+    //     keeps each `place:` line reading in the same order the
+    //     signal traverses: `Sig → Rb → Q1 → LOAD → V1`. tips/001-003
+    //     instead anchored on the most central component because they
+    //     fan out around it; here the topology is a chain, so
+    //     anchoring on the entry node fits better.
+    //   - Collector load tower runs vertically — `LOAD ... rot: 90`
+    //     stands the resistor on its end so the V1 → LOAD → Q1.c
+    //     run is one continuous up-and-down stripe. Standard low-side
+    //     switch motif: load above the transistor, emitter below,
+    //     base driven from the side.
+    nets {
+        VCC: power  { symbol: power_flag }
+        GND: ground { symbol: gnd_flag }
+    }
+    instances {
+        Sig:  VAC(amplitude: 5, frequency: 1k)    place: (4, 7)
+        Rb:   Resistor(value: 4.7k)               place: Sig.p1(4, 0)
+        Q1:   NPN                                 place: Rb.p2(3, 0)
+        LOAD: Resistor(value: 100)                place: Q1.c(0, -3) rot: 90
+        V1:   net VCC                             place: LOAD.p1(0, -2)
+        G1:   net GND                             place: Q1.e(0, 3)
+        G2:   net GND                             place: Sig.p2(0, 3)
+    }
+    connections {
+        Sig.p1     -> Rb.p1
+        Rb.p2      -> Q1.b
+        V1.pin     -> LOAD.p1
+        LOAD.p2    -> Q1.c
+        Q1.e       -> G1.pin
+        Sig.p2     -> G2.pin
+    }
+}

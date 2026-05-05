@@ -1,0 +1,56 @@
+# aelm-version: 0.3.0
+
+// title: RC Low-Pass Filter
+// topic: stdlib-parts
+// tags: #AELM #EDA #Filter #AnalogCircuits #Electronics
+// hint: First-order RC low-pass filter built from one resistor and one capacitor. Cutoff frequency fc = 1/(2πRC). The textbook RC network — every analog designer's first filter.
+
+use "passive.alib"
+use "sources.alib"
+use "measurement.alib"
+
+module RCLowPass {
+    nets {
+        GND: ground { symbol: gnd_flag }
+    }
+    instances {
+        // ── Placement recipe (read before moving anything) ──────────
+        // 1. Key part first — `R1` (the resistor at the heart of the
+        //    RC network) is the only instance with absolute coords;
+        //    everything else hangs off one of its pins.
+        // 2. Anchor pin choice — pick the side that matches the part's
+        //    role: `R1.p1` is the input node, so `Sig` (signal source)
+        //    sits left of it; `R1.p2` is the output node, so `C1`
+        //    (filter cap) drops below and `Probe` reaches in from the
+        //    right.
+        // 3. Coordinate sense — +x = right, +y = down. `(-3, 2)`
+        //    means "three grids left, two down". `rot: 90` stands a
+        //    horizontal symbol on its end (used for C1 so its body
+        //    runs vertically between the output node and ground).
+        R1:    Resistor(value: 10k)                   place: (4, 6)
+        Sig:   VAC(amplitude: 100m, frequency: 1k)    place: R1.p1(-3, 2)
+        C1:    Capacitor(value: 1.6n)                 place: R1.p2(1, 2) rot: 90
+        Probe: ScopeProbe                             place: R1.p2(4, 0)
+
+        // Net taps — each anchored on the pin it serves so the stub
+        // points straight down to the GND symbol. `Probe.gnd` is the
+        // alligator-clip pin (offset from the probe body), so its tap
+        // sits one grid further out than the others.
+        G1:    net GND                                place: Sig.p2(0, 1)
+        G2:    net GND                                place: C1.p2(0, 1)
+        G3:    net GND                                place: Probe.gnd(0, 3)
+    }
+    connections {
+        // `via: (x, y), ...` injects manual waypoints only where the
+        // auto-router would otherwise pick an awkward path. Sig is
+        // below R1, so the input wire bends through `(0, 6)` to come
+        // up over the VAC body before turning right into R1.p1
+        // instead of slicing across it.
+        Sig.p1    -> R1.p1 via: (0, 6)
+        R1.p2     -> C1.p1
+        R1.p2     -> Probe.tip
+        Sig.p2    -> G1.pin
+        C1.p2     -> G2.pin
+        Probe.gnd -> G3.pin
+    }
+}

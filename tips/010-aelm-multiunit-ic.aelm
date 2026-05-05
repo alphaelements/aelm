@@ -1,0 +1,157 @@
+# aelm-version: 0.3.1
+
+// title: AELM Multi-Unit IC — Sallen-Key Band-Pass Filter (LM358)
+// topic: dsl-stdlib
+// tags: #AELM #EDA #DSL #Tutorial #OpAmp #Filter
+// hint: A Sallen-Key band-pass filter built from two distinct 2nd-order sections — Stage A is a low-pass (≈10 kHz) and Stage B is a high-pass (≈100 Hz) — sharing one LM358 dual op-amp. The LPF-then-HPF order is the more common audio convention (band-limit first, DC-block last). The two stages have the same Sallen-Key topology with R and C swapped (R↔C duality), so the placement of the four component slots is identical; only the part types and values change between stages. The `units { A {...} B {...} _PWR {...} }` block renders the package as three independent symbols on the canvas — two `op_amp_signal` gates plus a dedicated `op_amp_power` block — while `expand: false` would draw it as a single `ic(left: 4, right: 4)` DIP-8 box.
+
+use "passive.alib"
+use "sources.alib"
+use "measurement.alib"
+
+part LM358 {
+    pins {
+        out_a: output @1
+        inm_a: input @2
+        inp_a: input @3
+        gnd:   ground @4
+        inp_b: input @5
+        inm_b: input @6
+        out_b: output @7
+        vcc:   power @8
+    }
+    symbol: ic(left: 4, right: 4)
+    units {
+        A {
+            pins: {
+                inp: inp_a
+                inm: inm_a
+                out: out_a
+            }
+            symbol: op_amp_signal
+        }
+        B {
+            pins: {
+                inp: inp_b
+                inm: inm_b
+                out: out_b
+            }
+            symbol: op_amp_signal
+        }
+        _PWR {
+            pins: {
+                vcc: vcc
+                vee: gnd
+            }
+            symbol: op_amp_power
+        }
+    }
+}
+
+module SallenKeyBandPass {
+    nets {
+        VCC: power  { symbol: power_flag }
+        GND: ground { symbol: gnd_flag }
+    }
+    instances {
+        // U1: LM358 expanded into three sub-symbols. Per-unit absolute
+        // placement keeps signal flow horizontal (A on the left, B on
+        // the right) and tucks the _PWR block above the signal lane
+        // so the rail taps land close to the IC.
+        U1: LM358 expand: true {
+            A:    place: (-5, 5)
+            B:    place: (12, 4)
+            _PWR: place: (-19, -1)
+        }
+
+        // Stage 1 — 2nd-order Sallen-Key *low-pass* around U1A
+        // (cutoff ≈ 10 kHz). Resistors sit in the series signal path,
+        // caps handle bypass-to-GND and positive feedback.
+        Sig: VAC(amplitude: 100m, frequency: 1k)  place: U1A.inp_a(-15, 1)
+        Ra1: Resistor(value: 10k)    place: U1A.inp_a(-9, 0)
+        Ra2: Resistor(value: 10k)    place: U1A.inp_a(-3, 0)
+        Ca1: Capacitor(value: 1.6n)  place: U1A.inp_a(-6, -3) rot: 270
+        Ca2: Capacitor(value: 1.6n)  place: U1A.inp_a(-1, 3) rot: 90
+
+        // Stage 2 — 2nd-order Sallen-Key *high-pass* around U1B
+        // (cutoff ≈ 100 Hz). Caps in series, resistors in shunt
+        // (positive feedback + DC bias). Together with Stage 1 the
+        // cascade passes ~100 Hz to ~10 kHz. Same four physical
+        // slots as Stage 1 — only the part types are swapped
+        // (R↔C duality of Sallen-Key).
+        Cb1: Capacitor(value: 160n)  place: U1B.inp_b(-9, 0)
+        Cb2: Capacitor(value: 160n)  place: U1B.inp_b(-3, 0)
+        Rb1: Resistor(value: 10k)    place: U1B.inp_b(-6, -3) rot: 270
+        Rb2: Resistor(value: 10k)    place: U1B.inp_b(-1, 3) rot: 90
+
+        // Filter output → scope probe.
+        Probe: ScopeProbe   place: U1B.out_b(5, 0)
+
+        // Rails — anchor on the _PWR unit's supply pins. Note the pin
+        // names land on the *part-level* `vcc` / `gnd` (not the unit-
+        // symbol-side `vcc` / `vee`): `snap_pins_to_grid` resolves
+        // each placed pin to the part definition's pad-numbered name,
+        // so `gnd` is what shows up on the layout regardless of the
+        // unit-side label.
+        V1: net VCC   place: U1_PWR.vcc(0, -2)
+        G1: net GND   place: U1_PWR.gnd(0, 2)
+
+        // Decoupling cap — 100 nF ceramic across VCC ↔ GND, parked
+        // right next to the _PWR block so the trace from the IC's
+        // supply pins to the cap stays short (low parasitic
+        // inductance). Cd is rotated 90° so p1 sits at the top
+        // (VCC side) and p2 at the bottom (GND side).
+        Cd: Capacitor(value: 100n)   place: U1_PWR.vcc(-2, 2) rot: 90
+
+        // Ground returns for the signal side. In Stage 1 (LPF) the
+        // bypass cap Ca2 drops to ground; in Stage 2 (HPF) its
+        // role-equivalent is Rb2 — the DC bias resistor.
+        Gsig:   net GND   place: Sig.p2(0, 4)
+        Gca2:   net GND   place: Ca2.p2(0, 2)
+        Grb2:   net GND   place: Rb2.p2(0, 2)
+        Gprobe: net GND   place: Probe.gnd(0, 2)
+    }
+    connections {
+        // Stage 1 — Sallen-Key LPF: Ra1 / Ra2 in series feed the
+        // non-inverting input, Ca1 closes positive feedback from the
+        // op-amp output to the resistor mid-node, Ca2 grounds the
+        // (+) input node, op-amp wired as a unity-gain follower.
+        Sig.p1   -> Ra1.p1
+        Sig.p2   -> Gsig.pin
+        Ra1.p2   -> Ra2.p1       // node A (mid-point between Ra1 / Ra2)
+        Ra2.p1   -> Ca1.p1       // Ca1 from node A → op-amp output
+        Ca1.p2   -> U1.out_a
+        Ra2.p2   -> U1.inp_a     // non-inverting input
+        Ca2.p1   -> U1.inp_a     // Ca2 from (+) input → GND
+        Ca2.p2   -> Gca2.pin
+        U1.inm_a -> U1.out_a     // unity-gain feedback
+
+        // Stage 2 — Sallen-Key HPF (the role-flipped twin of Stage 1):
+        // Cb1 / Cb2 in series block DC and pass higher freqs through
+        // to the non-inverting input, Rb1 closes positive feedback to
+        // the capacitor mid-node, Rb2 biases the (+) input to GND.
+        // Fed from Stage 1's output.
+        U1.out_a -> Cb1.p1
+        Cb1.p2   -> Cb2.p1       // node B
+        Cb2.p1   -> Rb1.p1       // Rb1 from node B → op-amp output
+        Rb1.p2   -> U1.out_b
+        Cb2.p2   -> U1.inp_b     // non-inverting input
+        Rb2.p1   -> U1.inp_b     // Rb2 from (+) input → GND (bias)
+        Rb2.p2   -> Grb2.pin
+        U1.inm_b -> U1.out_b     // unity-gain feedback
+
+        // Filter output to scope probe.
+        U1.out_b  -> Probe.tip
+        Probe.gnd -> Gprobe.pin
+
+        // Rails — connect via package-level pin names. The expand
+        // resolver routes each to the unit that declares the pin
+        // (here `_PWR` for `vcc` and `gnd`). The decoupling cap
+        // hangs across the same VCC / GND nets, kept short by its
+        // proximity to U1_PWR.
+        V1.pin -> U1.vcc
+        G1.pin -> U1.gnd
+        Cd.p1  -> U1.vcc
+        Cd.p2  -> U1.gnd
+    }
+}

@@ -1,0 +1,25 @@
+# aelm-version: 0.3.0
+
+// title: AELM Hello World — Minimal Circuit
+// topic: dsl-basics
+// tags: #AELM #EDA #DSL #Tutorial #Electronics
+// hint: The smallest valid AELM file. Define a `part` inline (no stdlib needed), instantiate it inside a `module`, and wire pins with the `->` operator. Drop this in a .aelm file and it renders.
+
+part Resistor {
+    pins {
+        a: passive @1
+        b: passive @2
+    }
+    symbol: resistor
+}
+
+module Hello {
+    instances {
+        R1: Resistor(value: 1k)
+        R2: Resistor(value: 4.7k)
+    }
+    connections {
+        R1.b -> R2.a
+        R2.b -> R1.a
+    }
+}

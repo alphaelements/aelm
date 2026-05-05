@@ -1,0 +1,64 @@
+# aelm-version: 0.3.1
+
+// title: OpAmp Non-Inverting Amplifier
+// topic: stdlib-parts
+// tags: #AELM #EDA #OpAmp #AnalogCircuits #Electronics
+// hint: Classic non-inverting amplifier built from a single op-amp. Gain = 1 + Rf/Rin sets the closed-loop gain. The input is an ideal AC source (`VAC` from sources.alib) so the schematic reads as a textbook small-signal test bench. Multiple GND symbols across the schematic share one declared net via `<id>: net GND` taps, so every ground stub reads `GND` instead of `GND1` / `GND2` / `GND3`.
+
+use "ic.alib"
+use "passive.alib"
+use "connector.alib"
+use "sources.alib"
+
+module NonInvAmp {
+    nets {
+        GND: ground { symbol: gnd_flag }
+        VCC: power  { symbol: power_flag }
+    }
+    instances {
+        // ── Placement recipe (read before moving anything) ──────────
+        // 1. Key part first — U1 (the OpAmp) is anchored with absolute
+        //    coords. Every other instance is placed pin-relative to it
+        //    or to one of its neighbours; do not scatter absolute
+        //    coords (CLAUDE.md "Placement Best Practice").
+        // 2. Anchor pin choice — pick the *closest* pin on the target
+        //    instance: `Rin` hangs off `U1.inm`, `Sig` off `U1.inp`,
+        //    `VOUT` off `U1.out`. The dx/dy is the offset of the new
+        //    body's origin from that pin in grid units.
+        // 3. Coordinate sense — +x = right, +y = down. So `(0, -2)`
+        //    means "two grids above" and `(0, 2)` means "two grids
+        //    below". Power taps go up, ground taps go down.
+        U1:   OpAmp                         place: (-1, 7)
+        Rin:  Resistor(value: 1k)           place: U1.inm(-3, -5)
+        Rf:   Resistor(value: 10k)          place: U1.inm(3, -5)
+        Sig:  VAC(amplitude: 100m, frequency: 1k)    place: U1.inp(-6, 2)
+        VOUT: Connector2                    place: U1.out(7, 0)
+
+        // Net taps — anchor each on the pin it serves so the short
+        // stub points in the rail's natural direction (V* up, G* down).
+        // Same shared symbol replaces the pre-#187
+        // `GND1 / GND2 / GND3` pattern: every position now reads `GND`.
+        V1: net VCC                         place: U1.vcc(0, -2)
+        G1: net GND                         place: U1.vee(0, 2)
+        G2: net GND                         place: Rin.p1(-2, 1)
+        G3: net GND                         place: Sig.p2(0, 2)
+        G4: net GND                         place: VOUT.pin_2(0, 3)
+    }
+    connections {
+        // `via: (x, y), ...` injects manual waypoints when the auto
+        // router would slice through a body or cross another net.
+        // Add them sparingly — only on the wires that actually need
+        // them after a layout pass; placement should still do most of
+        // the routing work.
+        Sig.p1      -> U1.inp via: (-9, 8)
+        Sig.p2      -> G3.pin
+        Rin.p1      -> G2.pin
+        Rin.p2      -> U1.inm via: (-4, 3)
+        U1.out      -> VOUT.pin_1
+        VOUT.pin_2  -> G4.pin
+        V1.pin      -> U1.vcc
+        G1.pin      -> U1.vee
+        Rin.p2      -> Rf.p1
+        Rf.p2       -> U1.out via: (4, 1), (4, 4)
+    }
+}

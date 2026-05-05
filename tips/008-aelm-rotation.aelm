@@ -1,0 +1,26 @@
+# aelm-version: 0.3.0
+
+// title: AELM Component Rotation
+// topic: dsl-layout
+// tags: #AELM #EDA #DSL #Tutorial #Layout
+// hint: `rot: 90 | 180 | 270` rotates a part counter-clockwise about its anchor. Default rot: 0 lays parts horizontally; rot: 90 stands them vertically — the trick that makes voltage dividers and pull-up strings legible.
+
+use "passive.alib"
+
+module RotationDemo {
+    nets {
+        VCC: power  { symbol: power_flag }
+        GND: ground { symbol: gnd_flag }
+    }
+    instances {
+        V1: net VCC                       place: (8, 2)
+        R1: Resistor(value: 10k)          place: V1.pin(0, 3) rot: 90
+        R2: Resistor(value: 10k)          place: R1.p2(0, 3) rot: 90
+        G1: net GND                       place: R2.p2(0, 2)
+    }
+    connections {
+        V1.pin -> R1.p1
+        R1.p2  -> R2.p1
+        R2.p2  -> G1.pin
+    }
+}

@@ -1,0 +1,32 @@
+# aelm-version: 0.3.0
+
+// title: AELM Relative Placement
+// topic: dsl-layout
+// tags: #AELM #EDA #DSL #Tutorial #Layout
+// hint: `place: R1.p2(3, 0)` anchors a part 3 grid units to the right of R1's p2 pin. Chained relative placement keeps schematics tidy and self-adjusting when components are swapped or resized.
+
+use "passive.alib"
+use "connector.alib"
+
+module RelativePlacementDemo {
+    nets {
+        GND: ground { symbol: gnd_flag }
+    }
+    instances {
+        VIN:  Connector2                  place: (4, 6) mirror: horizontal
+        R1:   Resistor(value: 1k)         place: VIN.pin_1(3, 0)
+        R2:   Resistor(value: 1k)         place: R1.p2(3, 0)
+        R3:   Resistor(value: 1k)         place: R2.p2(3, 0)
+        VOUT: Connector2                  place: R3.p2(5, 0)
+        G1:   net GND                     place: VIN.pin_2(0, 1)
+        G2:   net GND                     place: VOUT.pin_2(0, 1)
+    }
+    connections {
+        VIN.pin_1   -> R1.p1
+        R1.p2       -> R2.p1
+        R2.p2       -> R3.p1
+        R3.p2       -> VOUT.pin_1
+        VIN.pin_2   -> G1.pin
+        VOUT.pin_2  -> G2.pin
+    }
+}

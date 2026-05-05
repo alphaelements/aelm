@@ -1,0 +1,42 @@
+# aelm-version: 0.3.0
+
+// title: Resistor Voltage Divider
+// topic: stdlib-parts
+// tags: #AELM #EDA #AnalogCircuits #Electronics #Basics
+// hint: Two resistors split a supply voltage. Vout = Vin × R2/(R1+R2). A go-to building block when scaling a battery rail down to an MCU ADC's input range, or biasing a node.
+
+use "passive.alib"
+use "measurement.alib"
+
+module VoltageDivider {
+    // Two notes specific to this tip — the placement recipe itself
+    // already lives in tips/001 + tips/002:
+    //   - `R1.p2` is the divider midpoint and a three-way junction.
+    //     `R2.p1` carries the lower-half current and `Meter.hi` taps
+    //     the measured voltage off the same node, so two
+    //     `R1.p2 -> ...` lines in the `connections` block is
+    //     intentional, not a duplicate.
+    //   - DMM polarity: `Meter.hi` is the `+` jack (signal in),
+    //     `Meter.lo` is the `−` jack (returns to GND). The symbol
+    //     prints `+` / `−` next to each pin so the wiring direction
+    //     is unambiguous on the canvas.
+    nets {
+        VCC: power  { symbol: power_flag }
+        GND: ground { symbol: gnd_flag }
+    }
+    instances {
+        V1:    net VCC               place: (0, 0)
+        R1:    Resistor(value: 10k)  place: V1.pin(0, -8) rot: 90
+        R2:    Resistor(value: 10k)  place: R1.p2(0, 3) rot: 90
+        Meter: DMM                   place: R1.p2(4, -2)
+        G1:    net GND               place: R2.p2(0, 2)
+        G2:    net GND               place: Meter.lo(0, 7)
+    }
+    connections {
+        V1.pin     -> R1.p1
+        R1.p2      -> R2.p1
+        R1.p2      -> Meter.hi via: (3, 5)
+        R2.p2      -> G1.pin
+        Meter.lo   -> G2.pin
+    }
+}
