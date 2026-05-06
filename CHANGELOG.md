@@ -20,6 +20,38 @@ cut via `scripts/release.sh`.
 
 ## [Unreleased]
 
+### Added
+
+- **Annotation layer — Phase 1 (notes)** (#188 / #189). Three author
+  forms collapse onto one IR vec under `ModuleDef.notes`:
+  - `notes { N1: note "text" place: ... visible: ... style { ... } }`
+    — free-standing labels with absolute or pin-relative placement.
+  - `R1: ... note: "..."` — short inline label on an instance,
+    auto-positioned above the reference designator.
+  - `-> ... note: "..."` — inline label on a connection, drawn at the
+    routed wire's longest-segment midpoint.
+  Hidden notes (`visible: false`) emit a tiny grey placeholder circle
+  instead of text so the editor can show "there is a hidden note here"
+  without re-parsing. Inline `style { ... }` and a new stylesheet
+  `note { ... }` selector cascade onto the rendered text. Diagnostics:
+  `E_NOTE_002` / `E_NOTE_003` / `E_NOTE_004` / `E_NOTE_005`. See
+  `examples/note-showcase.aelm` and `Specification/BD-Annotation-Note`.
+
+### Internal
+
+- **Stdlib SVG snapshot regression suite** (#152). Added
+  `examples/stdlib-gallery.aelm` (21 stdlib parts on a single
+  deterministic page) plus `crates/aelm-render/tests/snapshot.rs`,
+  which renders the gallery and one solo SVG per part through the
+  same Stage 2 + Stage 3 pipeline as `aelm render` and asserts each
+  output against an `insta` snapshot under
+  `crates/aelm-render/tests/snapshots/`. Pin position, label anchor,
+  and viewBox regressions now surface as a CI-visible diff. Update
+  intentional changes with `INSTA_UPDATE=always cargo test -p
+  aelm-render --test snapshot`; rejected snapshots ride out of the
+  GitLab `test` job as `**/snapshots/*.snap.new` artifacts. See
+  `wiki/Reference/Dev-Environment.md` for the full workflow.
+
 ## [0.3.4] - 2026-05-06
 
 ### Fixed

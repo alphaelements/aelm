@@ -1,0 +1,59 @@
+# aelm-version: 0.3.0
+// Single-page gallery of every stdlib symbol exercised by the
+// snapshot regression suite (issue #152). Parts are grouped by
+// category and each row anchors off its leftmost instance so the
+// layout is deterministic across renders — no auto-layout reliance.
+//
+// OpAmp's supply pins are wired to net-tap power_flag / gnd_flag
+// symbols so the gallery is DRC-clean while still showcasing the
+// power and ground flag glyphs.
+
+use "passive.alib"
+use "semiconductor.alib"
+use "ic.alib"
+use "switches.alib"
+
+module StdlibGallery {
+    nets {
+        VCC: power  { symbol: power_flag }
+        GND: ground { symbol: gnd_flag }
+    }
+    instances {
+        // ── Row 1: basic passives ─────────────────────────────────
+        R1:   Resistor                  place: (0, 0)         nc: all
+        C1:   Capacitor                 place: R1.p2(5, 0)    nc: all
+        L1:   Inductor                  place: C1.p2(5, 0)    nc: all
+        F1:   Fuse                      place: L1.p2(5, 0)    nc: all
+        FB1:  FerriteBead               place: F1.p2(5, 0)    nc: all
+
+        // ── Row 2: polarised + variable + bulk passives ──────────
+        CP1:  CapacitorP                place: (0, -7)        nc: all
+        POT1: Potentiometer             place: CP1.p2(5, 0)   nc: all
+        TR1:  Transformer               place: POT1.p2(5, 0)  nc: all
+        BAT1: Battery                   place: TR1.sec1(6, 1) nc: all
+        Y1:   Crystal                   place: BAT1.p2(5, 0)  nc: all
+
+        // ── Row 3: diodes + first BJT ────────────────────────────
+        D1:   Diode                     place: (0, -14)       nc: all
+        LED1: LED                       place: D1.k(5, 0)     nc: all
+        Z1:   Zener                     place: LED1.k(5, 0)   nc: all
+        SCH1: Schottky                  place: Z1.k(5, 0)     nc: all
+        NPN1: NPN                       place: SCH1.k(6, 0)   nc: all
+
+        // ── Row 4: BJT + MOSFETs + OpAmp ─────────────────────────
+        PNP1: PNP                       place: (0, -22)       nc: all
+        NMOS1: NMOS                     place: PNP1.e(6, 0)   nc: all
+        PMOS1: PMOS                     place: NMOS1.s(6, 0)  nc: all
+        U1:    OpAmp                    place: PMOS1.s(8, 0)  nc: [inp, inm, out]
+        V1:    net VCC                  place: U1.vcc(0, -2)
+        G1:    net GND                  place: U1.vee(0, 2)
+
+        // ── Row 5: switches ──────────────────────────────────────
+        SW1:   SwitchSPST               place: (0, -30)       nc: all
+        SW2:   SwitchSPDT               place: SW1.p2(6, 0)   nc: all
+    }
+    connections {
+        V1.pin -> U1.vcc
+        G1.pin -> U1.vee
+    }
+}

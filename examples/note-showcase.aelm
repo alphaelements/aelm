@@ -1,0 +1,51 @@
+# aelm-version: 0.3.0
+// note-showcase — #189 demo of the three note forms.
+//   - Phase 1.0: `notes {}` block (Standalone, place: required)
+//   - Phase 1.5: inline on instance (`R1: ... note: "..."`)
+//   - Phase 1.5: inline on connection (`-> ... note: "..."`)
+// Plus visibility toggle, inline style cascade, hidden-marker.
+
+use "passive.alib"
+use "semiconductor.alib"
+
+module NotesShowcase {
+    instances {
+        // Inline-instance notes (Phase 1.5) — short label, position
+        // auto-derived from the reference designator.
+        R1: Resistor(value: 10k)  place: (0, 0)              nc: all  note: "pull-up"
+        R2: Resistor(value: 4.7k) place: R1.p2(5, 0)         nc: all
+        D1: LED                   place: R2.p2(6, 0)         nc: all
+    }
+
+    connections {
+        // Inline-connection note (Phase 1.5) — placed at the routing
+        // midpoint of this wire by Stage 2 of the renderer.
+        R1.p2 -> R2.p1 note: "midpoint"
+    }
+
+    notes {
+        // Phase 1.0 block-form notes — explicit placement.
+        N_TITLE: note "Voltage Divider Demo"
+            place: (0, -8)
+            style { font_size: 2.0; font_weight: bold; }
+
+        N_R1: note "10k pull-up details"
+            place: R1.p1(0, -3)
+
+        N_LED: note "indicator"
+            place: D1.k(0, -3)
+            style { font_style: italic; fill: "#cc0000"; }
+
+        // Hidden note — Phase 1.5 emits a small placeholder circle so
+        // editors can show "there is a hidden note here" without
+        // re-parsing.
+        N_HIDDEN: note "internal note (hidden)"
+            place: (0, 6)
+            visible: false
+
+        // Rotation hint stays in the IR; SVG transform application is
+        // a Phase 2 visual polish.
+        N_ROTATED: note "side panel"
+            place: (-6, 0) rot: 90
+    }
+}

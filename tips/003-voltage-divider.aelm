@@ -26,7 +26,7 @@ module VoltageDivider {
     }
     instances {
         V1:    net VCC               place: (0, 0)
-        R1:    Resistor(value: 10k)  place: V1.pin(0, 2) rot: 90
+        R1:    Resistor(value: 10k)  place: V1.pin(0, -8) rot: 90
         R2:    Resistor(value: 10k)  place: R1.p2(0, 3) rot: 90
         Meter: DMM                   place: R1.p2(4, -2)
         G1:    net GND               place: R2.p2(0, 2)
