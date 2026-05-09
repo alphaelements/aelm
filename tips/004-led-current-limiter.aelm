@@ -1,9 +1,9 @@
-# aelm-version: 0.3.1
+# aelm-version: 0.4.0
 
 // title: LED with Current-Limiting Resistor
 // topic: stdlib-parts
-// tags: #AELM #EDA #LED #AnalogCircuits #Hobbyist
-// hint: The simplest LED-driving circuit. A series resistor sets the forward current: R = (Vcc − Vf) / If. Example: Vcc=5V, Vf=2V, If=10mA → R≈300Ω. Without it, the LED dies fast.
+// tags: #AELM #EDA #LED #AnalogCircuits #Hobbyist #Math #Notes
+// hint: The simplest LED-driving circuit. A series resistor sets the forward current: R = (Vcc − Vf) / If. Example: Vcc=5V, Vf=2V, If=10mA → R≈300Ω. Without it, the LED dies fast. The resistance formula is annotated on the schematic using `notes {}` with `$...$` math.
 
 use "passive.alib"
 use "semiconductor.alib"
@@ -23,5 +23,23 @@ module LEDDriver {
         V1.pin   -> R1.p1
         R1.p2    -> D1.a
         D1.k     -> G1.pin
+    }
+
+    notes {
+        N_TITLE: note "LED Current Limiter"
+            place: V1.pin(-9, 0)
+            style { font_size: 2.0; font_weight: bold; background: "none"; }
+
+        N_FORMULA: note "$R = \frac{V_{CC} - V_f}{I_f}$"
+            place: R1.p1(-9, 1)
+            style { font_size: 1.8; background: "none"; }
+
+        N_EXAMPLE: note [
+            Example: Vcc = 5 V, Vf = 2 V, If = 10 mA
+            
+            $R_{1} = \frac{5 - 2}{0.01} = 300\,\Omega$
+        ]
+            place: R1.p2(-9, 3)
+            style { font_size: 1.4; }
     }
 }

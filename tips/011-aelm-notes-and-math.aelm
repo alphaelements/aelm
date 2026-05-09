@@ -1,0 +1,72 @@
+# aelm-version: 0.4.0
+
+// title: AELM Notes and Math — Annotate Your Schematics
+// topic: dsl-annotation
+// tags: #AELM #EDA #DSL #Tutorial #Notes #Math #Annotation
+// hint: The `notes {}` block adds text annotations to a schematic. Three forms: (1) standalone block-form with `place:`, (2) inline on instance `note: "..."`, (3) inline on connection `note: "..."`. Wrap formulas in `$...$` fences for rendered math (LaTeX subset). Multi-line notes use `[ ... ]` brackets. Style with `style { font_size: N; font_weight: bold; }`.
+
+use "passive.alib"
+use "semiconductor.alib"
+
+module NotesAndMathDemo {
+    nets {
+        VCC: power  { symbol: power_flag }
+        GND: ground { symbol: gnd_flag }
+    }
+    instances {
+        V1: net VCC                       place: (0, 0)
+        R1: Resistor(value: 10k)          place: V1.pin(0, 3) rot: 90
+        R2: Resistor(value: 10k)          place: R1.p2(0, 3) rot: 90  note: "lower leg"
+        D1: LED                           place: R2.p2(0, 3) rot: 90
+        G1: net GND                       place: D1.k(0, 2)
+    }
+    connections {
+        V1.pin -> R1.p1
+        R1.p2  -> R2.p1 note: "midpoint tap"
+        R2.p2  -> D1.a
+        D1.k   -> G1.pin
+    }
+
+    notes {
+        N_TITLE: note "Notes & Math Demo"
+            place: V1.pin(-10, -2)
+            style { font_size: 2.5; font_weight: bold; background: "none"; }
+
+        N_INLINE: note [
+            Inline notes:
+            instance → note: "label"
+            connection → note: "label"
+        ]
+            place: V1.pin(-10, 2)
+            style { font_size: 1.4; }
+
+        N_MATH_SIMPLE: note "$V = IR$"
+            place: R1.p1(6, 0)
+            style { font_size: 2.0; background: "none"; }
+
+        N_MATH_FRAC: note "$V_{mid} = V_{CC} \cdot \frac{R_2}{R_1 + R_2}$"
+            place: R1.p2(6, 0)
+            style { font_size: 1.8; background: "none"; }
+
+        N_MATH_GREEK: note "$\tau = RC \quad \omega = 2\pi f$"
+            place: R2.p2(6, 0)
+            style { font_size: 1.8; background: "none"; }
+
+        N_MULTILINE: note [
+            Design checklist:
+            1. Choose R for target If
+            2. Verify power dissipation
+            $P = I^2 R$
+        ]
+            place: D1.a(6, -1)
+            style { font_size: 1.2; text_align: left; }
+
+        N_HIDDEN: note "internal reference (hidden on canvas)"
+            place: G1.pin(0, 3)
+            visible: false
+
+        N_ROTATED: note "rotated label"
+            place: V1.pin(-4, 5)
+            rot: 90
+    }
+}

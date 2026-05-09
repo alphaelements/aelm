@@ -1,0 +1,69 @@
+# aelm-version: 0.4.0
+
+// title: AELM Plots — OpAmp Gain Waveform
+// topic: dsl-annotation
+// tags: #AELM #EDA #DSL #Tutorial #Plots #Math #Notes #OpAmp
+// hint: A non-inverting amplifier (gain = 1 + Rf/Rin = 11) with its input and output waveforms plotted directly on the schematic. The `plots {}` block renders graphs on the canvas using `y = expression` traces. Combined with `notes {}` math annotations (`$...$`), the schematic becomes a self-documenting design sheet. Plots and notes are annotation-only — DRC and routing ignore them.
+
+use "ic.alib"
+use "passive.alib"
+use "sources.alib"
+
+module OpAmpGainPlot {
+    nets {
+        GND: ground { symbol: gnd_flag }
+        VCC: power  { symbol: power_flag }
+    }
+    instances {
+        U1:   OpAmp                                   place: (0, 7)
+        Rin:  Resistor(value: 1k)                     place: U1.inm(-3, -5)
+        Rf:   Resistor(value: 10k)                    place: U1.inm(3, -5)
+        Sig:  VAC(amplitude: 100m, frequency: 1k)     place: U1.inp(-6, 2)
+
+        V1: net VCC                                   place: U1.vcc(0, -2)
+        G1: net GND                                   place: U1.vee(0, 2)
+        G2: net GND                                   place: Rin.p1(-2, 1)
+        G3: net GND                                   place: Sig.p2(0, 2)
+    }
+    connections {
+        Sig.p1  -> U1.inp via: (-8, 8)
+        Sig.p2  -> G3.pin
+        Rin.p1  -> G2.pin
+        Rin.p2  -> U1.inm via: (-3, 3)
+        Rin.p2  -> Rf.p1
+        Rf.p2   -> U1.out via: (4, 1), (4, 4)
+        V1.pin  -> U1.vcc
+        G1.pin  -> U1.vee
+    }
+
+    notes {
+        N_TITLE: note "Non-Inverting Amplifier"
+            place: U1.inp(-10, -9)
+            style { font_size: 2.0; font_weight: bold; background: "none"; }
+
+        N_GAIN: note "$A_v = 1 + \frac{R_f}{R_{in}} = 1 + \frac{10k}{1k} = 11$"
+            place: U1.out(-16, -1)
+            style { font_size: 1.6; background: "none"; }
+
+        N_INPUT: note "$V_{in} = 100\,mV_{pp}$  @ 1 kHz"
+            place: Sig.p1(-6, -6)
+            style { font_size: 1.2; background: "none"; }
+
+        N_OUTPUT: note "$V_{out} = A_v \cdot V_{in} = 1.1\,V_{pp}$"
+            place: U1.out(5, -5)
+            style { font_size: 1.2;}
+    }
+
+    plots {
+        P_WAVE: plot {
+            place: U1.out(3, -4)
+            size: (20, 10)
+            x: { range: 0..0.003, label: "t [ms]", scale: 1000, grid: true }
+            y: { range: -0.8..0.8, label: "V" }
+            traces {
+                vin:  y = 0.05*sin(2*pi*1000*x) label: "Vin (x10)"
+                vout: y = 0.55*sin(2*pi*1000*x) label: "Vout" style { stroke_color: "#cc0000"; }
+            }
+        }
+    }
+}

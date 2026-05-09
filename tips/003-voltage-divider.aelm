@@ -1,9 +1,9 @@
-# aelm-version: 0.3.0
+# aelm-version: 0.4.0
 
 // title: Resistor Voltage Divider
 // topic: stdlib-parts
-// tags: #AELM #EDA #AnalogCircuits #Electronics #Basics
-// hint: Two resistors split a supply voltage. Vout = Vin × R2/(R1+R2). A go-to building block when scaling a battery rail down to an MCU ADC's input range, or biasing a node.
+// tags: #AELM #EDA #AnalogCircuits #Electronics #Basics #Math #Notes
+// hint: Two resistors split a supply voltage. Vout = Vin × R2/(R1+R2). A go-to building block when scaling a battery rail down to an MCU ADC's input range, or biasing a node. The divider formula is displayed on the schematic using `notes {}` with `$...$` math fences.
 
 use "passive.alib"
 use "measurement.alib"
@@ -38,5 +38,23 @@ module VoltageDivider {
         R1.p2      -> Meter.hi via: (3, 5)
         R2.p2      -> G1.pin
         Meter.lo   -> G2.pin
+    }
+
+    notes {
+        N_TITLE: note "Voltage Divider"
+            place: V1.pin(-6, 0)
+            style { font_size: 2.0; font_weight: bold; background: "none"; }
+
+        N_FORMULA: note "$V_{out} = V_{in} \cdot \frac{R_2}{R_1 + R_2}$"
+            place: Meter.hi(-9, 0)
+            style { font_size: 1.8; background: "none"; }
+
+        N_EQUAL: note [
+            Equal divider (R1 = R2):
+            
+            $V_{out} = \frac{V_{in}}{2}$
+        ]
+            place: Meter.hi(-9, 4)
+            style { font_size: 1.4; }
     }
 }

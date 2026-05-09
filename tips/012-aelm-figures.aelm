@@ -1,0 +1,52 @@
+# aelm-version: 0.4.0
+
+// title: AELM Figures — Drawing Shapes on Schematics
+// topic: dsl-annotation
+// tags: #AELM #EDA #DSL #Tutorial #Figures #Annotation
+// hint: The `figures {}` block draws geometric shapes on the schematic canvas. Seven primitives: `line`, `figure_rect`, `circle`, `ellipse`, `arc`, `arrow`, `figure_text`. All support `style { ... }` for color, stroke, and fill. Coordinates can be absolute `(x, y)` or pin-relative `Instance.pin(dx, dy)`. Figures are annotation-only — DRC and routing ignore them.
+
+use "passive.alib"
+
+module FiguresDemo {
+    nets {
+        VCC: power  { symbol: power_flag }
+        GND: ground { symbol: gnd_flag }
+    }
+    instances {
+        V1: net VCC                       place: (10, 4)
+        R1: Resistor(value: 10k)          place: V1.pin(0, 3) rot: 90
+        R2: Resistor(value: 4.7k)         place: R1.p2(0, 3) rot: 90
+        G1: net GND                       place: R2.p2(0, 2)
+    }
+    connections {
+        V1.pin -> R1.p1
+        R1.p2  -> R2.p1
+        R2.p2  -> G1.pin
+    }
+
+    figures {
+        FRAME: figure_rect place: (4, 0) size: (14, 22)
+            style { stroke_color: "#888888"; stroke_width: 0.3; }
+
+        DIVIDER: line from: (4, 4) to: (18, 4)
+            style { stroke_color: "#cccccc"; stroke_width: 0.2; }
+
+        TITLE: figure_text "VOLTAGE DIVIDER" place: (5, 2)
+            style { font_size: 1.6; font_weight: bold; }
+
+        CALLOUT: arrow from: (20, 10) to: R1.p2(1, 0)
+            style { stroke_color: "#cc0000"; stroke_width: 0.25; }
+
+        CALLOUT_LABEL: figure_text "Vout tap" place: (21, 10)
+            style { font_size: 1.2; fill: "#cc0000"; }
+
+        HIGHLIGHT: circle place: R1.p2(0, 0) radius: 2
+            style { stroke_color: "#0066cc"; stroke_width: 0.2; fill: "#cce5ff"; }
+
+        ZONE: ellipse place: (10, 10) radius: (5, 8)
+            style { stroke_color: "#009900"; stroke_width: 0.15; }
+
+        CORNER: arc center: (18, 0) radius: 2 from_deg: 180 sweep_deg: 90
+            style { stroke_color: "#666666"; stroke_width: 0.2; }
+    }
+}

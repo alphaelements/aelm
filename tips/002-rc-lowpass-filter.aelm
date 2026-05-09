@@ -1,9 +1,9 @@
-# aelm-version: 0.3.0
+# aelm-version: 0.4.0
 
 // title: RC Low-Pass Filter
 // topic: stdlib-parts
-// tags: #AELM #EDA #Filter #AnalogCircuits #Electronics
-// hint: First-order RC low-pass filter built from one resistor and one capacitor. Cutoff frequency fc = 1/(2πRC). The textbook RC network — every analog designer's first filter.
+// tags: #AELM #EDA #Filter #AnalogCircuits #Electronics #Math #Notes
+// hint: First-order RC low-pass filter built from one resistor and one capacitor. Cutoff frequency fc = 1/(2πRC). The textbook RC network — every analog designer's first filter. Annotations show the transfer function and cutoff formula using `notes {}` with embedded `$...$` math.
 
 use "passive.alib"
 use "sources.alib"
@@ -52,5 +52,19 @@ module RCLowPass {
         Sig.p2    -> G1.pin
         C1.p2     -> G2.pin
         Probe.gnd -> G3.pin
+    }
+
+    notes {
+        N_TITLE: note "RC Low-Pass Filter"
+            place: R1.p1(2, -3)
+            style { font_size: 2.0; font_weight: bold; background: "none"; }
+
+        N_TRANSFER: note "$H(s) = \frac{1}{1 + sRC}$"
+            place: R1.p2(-4, 8)
+            style { font_size: 1.8; background: "none"; }
+
+        N_CUTOFF: note "$f_c = \frac{1}{2\pi RC} \approx 10\,kHz$"
+            place: R1.p2(3, 8)
+            style { font_size: 1.8; background: "none"; }
     }
 }
