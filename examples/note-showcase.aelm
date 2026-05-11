@@ -1,4 +1,4 @@
-# aelm-version: 0.3.0
+# aelm-version: 0.4.0
 // note-showcase — #189 demo of the three note forms.
 //   - Phase 1.0: `notes {}` block (Standalone, place: required)
 //   - Phase 1.5: inline on instance (`R1: ... note: "..."`)
@@ -26,14 +26,16 @@ module NotesShowcase {
     notes {
         // Phase 1.0 block-form notes — explicit placement.
         N_TITLE: note "Voltage Divider Demo"
-            place: (0, -8)
+            place: (3, -6)
             style { font_size: 2.0; font_weight: bold; }
 
         N_R1: note "10k pull-up details"
             place: R1.p1(0, -3)
 
+        // Pin-less component-relative placement (#189 follow-up):
+        // `D1(0, -3)` anchors on D1's body origin instead of a pin.
         N_LED: note "indicator"
-            place: D1.k(0, -3)
+            place: D1(0, -3)
             style { font_style: italic; fill: "#cc0000"; }
 
         // Hidden note — Phase 1.5 emits a small placeholder circle so
@@ -43,9 +45,49 @@ module NotesShowcase {
             place: (0, 6)
             visible: false
 
-        // Rotation hint stays in the IR; SVG transform application is
-        // a Phase 2 visual polish.
+        // Rotation rotates the card, glyphs, and bbox together (#189
+        // follow-up). Authors can write `rot:` inline next to `place:`
+        // or on its own line; the canvas R-key writes the latter form.
         N_ROTATED: note "side panel"
-            place: (-6, 0) rot: 90
+            place: (-6, 0)
+            rot: 90
+
+        // Background opt-out (#189 follow-up): `style { background:
+        // "none"; }` skips the memo card silhouette so the text floats
+        // straight on the schematic — useful for unobtrusive captions
+        // that should not draw a yellow card behind themselves.
+        N_NOCARD: note "no card — text only"
+            place: (12, -6)
+            style { background: "none"; }
+
+        // Multi-line block-form note (#189 follow-up). Inside `[ ... ]`
+        // each source line is one rendered line — no per-line quotes,
+        // no comma separators, just paste your text. The renderer
+        // stacks the lines with 1.4× line-height. Inline forms
+        // (`note: "..."` on instances / connections) stay single-line.
+        N_MULTI: note [
+            multi-line memo
+            keep notes readable
+            without crowding
+        ]
+            place: (8, 6)
+
+        // Per-line text alignment via `style { text_align: ... }`.
+        // Default is `center`; `left` hugs the left edge of the
+        // widest line (useful for body-text memos), `right` hugs the
+        // right edge. The card stays centred on `place:` either way.
+        N_LEFT: note [
+            left-aligned memo
+            shorter line
+        ]
+            place: (-12, 8)
+            style { text_align: left; }
+
+        N_RIGHT: note [
+            right-aligned
+            shorter
+        ]
+            place: (15, 8)
+            style { text_align: right; }
     }
 }

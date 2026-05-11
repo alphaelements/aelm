@@ -1,4 +1,4 @@
-# aelm-version: 0.3.0
+# aelm-version: 0.4.0
 // Single-page gallery of every stdlib symbol exercised by the
 // snapshot regression suite (issue #152). Parts are grouped by
 // category and each row anchors off its leftmost instance so the

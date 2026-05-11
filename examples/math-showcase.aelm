@@ -1,0 +1,226 @@
+# aelm-version: 0.4.0
+// math-showcase — #191 Phase 11 demonstration of every supported
+// LaTeX-subset construct. Each row exercises one feature category
+// so visual regressions surface as a per-row diff.
+//
+// Conventions:
+//  - Two columns. Left column at x = -55, right column at x = +5.
+//  - 6mm row pitch (font_size = 3mm, NOTE_LINE_PITCH_FACTOR = 1.4).
+//  - background: "none" — math glyphs read directly against the
+//    schematic surface so the page card never crops a fraction.
+
+module MathShowcase {
+    notes {
+        // ── Italic Latin + upright digits / operators ──────────
+        T_LATIN: note "Latin variables and digits"
+            place: (-55, -90)
+            style { font_size: 3.5; font_weight: "bold"; background: "none"; }
+
+        L_LOWER: note "Lower: $abcdefghijklmnopqrstuvwxyz$"
+            place: (-55, -84)  style { font_size: 3.0; background: "none"; }
+        L_UPPER: note "Upper: $ABCDEFGHIJKLMNOPQRSTUVWXYZ$"
+            place: (-55, -79)  style { font_size: 3.0; background: "none"; }
+        L_DIG:   note "Digits: $0123456789$ Ops: $a + b - c = d * e / f$"
+            place: (-55, -74)  style { font_size: 3.0; background: "none"; }
+        L_MIX:   note "Mixed: $2x + 3y = 7$ and $a^2 + b^2 = c^2$"
+            place: (-55, -69)  style { font_size: 3.0; background: "none"; }
+
+        // ── Greek (lowercase + variants, uppercase) ────────────
+        T_GREEK: note "Greek alphabet"
+            place: (-55, -60)
+            style { font_size: 3.5; font_weight: "bold"; background: "none"; }
+
+        G_L1: note "$\alpha \beta \gamma \delta \epsilon \zeta \eta \theta \iota \kappa \lambda \mu$"
+            place: (-55, -54)  style { font_size: 3.0; background: "none"; }
+        G_L2: note "$\nu \xi \omicron \pi \rho \sigma \tau \upsilon \phi \chi \psi \omega$"
+            place: (-55, -49)  style { font_size: 3.0; background: "none"; }
+        G_VAR: note "Variants: $\varepsilon \vartheta \varpi \varrho \varphi$"
+            place: (-55, -44)  style { font_size: 3.0; background: "none"; }
+        G_U:   note "Upper: $\Gamma \Delta \Theta \Lambda \Xi \Pi \Sigma \Upsilon \Phi \Psi \Omega$"
+            place: (-55, -39)  style { font_size: 3.0; background: "none"; }
+
+        // ── Sub/superscripts (single, multi-char, nested) ──────
+        T_SCRIPT: note "Sub / superscripts"
+            place: (-55, -30)
+            style { font_size: 3.5; font_weight: "bold"; background: "none"; }
+
+        S_SIMPLE: note "$x_1 \quad x^2 \quad x_1^2 \quad x_{i,j}$"
+            place: (-55, -24)  style { font_size: 3.0; background: "none"; }
+        S_NEST:   note "Nested: $a^{b^{c}} \quad a_{b_{c}}$"
+            place: (-55, -19)  style { font_size: 3.0; background: "none"; }
+        S_MIXED:  note "$T_{i,j}^{k} = M_{ij}^{(k)} + \delta_{ij}$"
+            place: (-55, -14)  style { font_size: 3.0; background: "none"; }
+        S_LONG:   note "Long base: $V_{out} = V_{in} \cdot G_{loop}$"
+            place: (-55, -9)   style { font_size: 3.0; background: "none"; }
+
+        // ── Fractions (simple, deep, in expression) ────────────
+        T_FRAC: note "Fractions"
+            place: (-55, 0)
+            style { font_size: 3.5; font_weight: "bold"; background: "none"; }
+
+        F_SIMPLE: note "$\frac{1}{2} \quad \frac{a+b}{c-d} \quad \frac{x^2 + 1}{x - 1}$"
+            place: (-55, 6)   style { font_size: 3.0; background: "none"; }
+        F_NEST:   note "Nested: $\frac{1}{1 + \frac{1}{1 + \frac{1}{x}}}$"
+            place: (-55, 11)  style { font_size: 3.0; background: "none"; }
+        F_AXIS:   note "Aligned: $\frac{1}{2} = \frac{2}{4} = \frac{3}{6}$ all on axis"
+            place: (-55, 16)  style { font_size: 3.0; background: "none"; }
+        F_QUAD:   note "Quadratic: $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$"
+            place: (-55, 21)  style { font_size: 3.0; background: "none"; }
+
+        // ── Roots (variant sizing) ────────────────────────────
+        T_ROOT: note "Square roots (auto-sized)"
+            place: (-55, 30)
+            style { font_size: 3.5; font_weight: "bold"; background: "none"; }
+
+        R_SIMPLE: note "$\sqrt{2} \quad \sqrt{x+y} \quad \sqrt{x^2 + y^2}$"
+            place: (-55, 36)  style { font_size: 3.0; background: "none"; }
+        R_FRAC:   note "$\sqrt{\frac{a}{b}} \quad \sqrt{\frac{x^2+1}{x-1}}$"
+            place: (-55, 42)  style { font_size: 3.0; background: "none"; }
+        R_DEEP:   note "$\sqrt{1 + \sqrt{1 + \sqrt{1 + x}}}$"
+            place: (-55, 48)  style { font_size: 3.0; background: "none"; }
+        R_TALL:   note "$\sqrt{\frac{1}{\frac{2}{3}}} \quad \sqrt{\frac{a+b}{\frac{c}{d+e}}}$"
+            place: (-55, 55)  style { font_size: 3.0; background: "none"; }
+
+        // ── Absolute value ────────────────────────────────────
+        A_ABS:    note "$|x| \quad |\frac{a}{b}| \quad |a + b| \le |a| + |b|$"
+            place: (-55, 62)  style { font_size: 3.0; background: "none"; }
+
+        // ── Big operators ──────────────────────────────────────
+        T_BIGOP: note "Big operators"
+            place: (-55, 70)
+            style { font_size: 3.5; font_weight: "bold"; background: "none"; }
+
+        B_SUM:  note "Sum: $\sum_{i=1}^{n} i = \frac{n(n+1)}{2}$"
+            place: (-55, 76)  style { font_size: 3.0; background: "none"; }
+        B_PROD: note "Product: $\prod_{k=1}^{n} k = n!$"
+            place: (-55, 81)  style { font_size: 3.0; background: "none"; }
+        B_INT:  note "Integral: $\int_{0}^{\infty} e^{-x} dx = 1$"
+            place: (-55, 86)  style { font_size: 3.0; background: "none"; }
+        B_INTS: note "Multi: $\iint_S f \quad \iiint_V g \quad \oint_C h$"
+            place: (-55, 91)  style { font_size: 3.0; background: "none"; }
+
+        // ── Right column ──────────────────────────────────────
+
+        // ── Relations + binary operators ───────────────────────
+        T_REL: note "Relations and binary operators"
+            place: (5, -90)
+            style { font_size: 3.5; font_weight: "bold"; background: "none"; }
+
+        REL_ORD: note "Order: $a \le b \quad b \ge c \quad c \ll d \quad d \gg e$"
+            place: (5, -84)  style { font_size: 3.0; background: "none"; }
+        REL_EQ:  note "Equiv: $a = b \quad a \ne c \quad a \approx b \quad a \equiv b$"
+            place: (5, -79)  style { font_size: 3.0; background: "none"; }
+        REL_SIM: note "Similar: $a \sim b \quad a \simeq b \quad a \cong b \quad a \propto b$"
+            place: (5, -74)  style { font_size: 3.0; background: "none"; }
+        BIN_OP:  note "Binary: $\pm \mp \times \div \cdot \circ \bullet \vee \wedge$"
+            place: (5, -69)  style { font_size: 3.0; background: "none"; }
+        BIN_O:   note "Circled: $\oplus \ominus \otimes \odot \oslash$"
+            place: (5, -64)  style { font_size: 3.0; background: "none"; }
+
+        // ── Set theory and logic ───────────────────────────────
+        T_SET: note "Set theory and logic"
+            place: (5, -55)
+            style { font_size: 3.5; font_weight: "bold"; background: "none"; }
+
+        SET_MEMB:   note "$x \in A \quad y \notin B \quad \emptyset \subset A$"
+            place: (5, -49)  style { font_size: 3.0; background: "none"; }
+        SET_OPS:    note "$A \cup B \quad A \cap B \quad A \subseteq B \quad A \supseteq B$"
+            place: (5, -44)  style { font_size: 3.0; background: "none"; }
+        LOGIC:      note "$\forall x \exists y \quad p \wedge q \quad p \vee q \quad \neg p$"
+            place: (5, -39)  style { font_size: 3.0; background: "none"; }
+
+        // ── Arrows ─────────────────────────────────────────────
+        T_ARROW: note "Arrows"
+            place: (5, -30)
+            style { font_size: 3.5; font_weight: "bold"; background: "none"; }
+
+        AR_SINGLE: note "$a \to b \quad b \leftarrow a \quad p \uparrow \quad q \downarrow$"
+            place: (5, -24)  style { font_size: 3.0; background: "none"; }
+        AR_DOUBLE: note "$a \Rightarrow b \quad b \Leftarrow a \quad x \Leftrightarrow y$"
+            place: (5, -19)  style { font_size: 3.0; background: "none"; }
+        AR_MAP:    note "Map: $f : A \to B \quad x \mapsto f(x)$"
+            place: (5, -14)  style { font_size: 3.0; background: "none"; }
+
+        // ── Calculus and miscellaneous ─────────────────────────
+        T_MISC: note "Calculus and miscellaneous symbols"
+            place: (5, -5)
+            style { font_size: 3.5; font_weight: "bold"; background: "none"; }
+
+        M_DERIV: note "Partial: $\frac{\partial f}{\partial x} \quad \nabla f \quad \infty$"
+            place: (5, 1)   style { font_size: 3.0; background: "none"; }
+        M_CONST: note "Constants: $\hbar \quad \ell \quad \aleph \quad \Re \quad \Im$"
+            place: (5, 6)   style { font_size: 3.0; background: "none"; }
+        M_GEOM:  note "Geometry: $\angle ABC \quad AB \perp CD \quad m \parallel n$"
+            place: (5, 11)  style { font_size: 3.0; background: "none"; }
+        M_PRIME: note "Prime: $f' \quad f'' \quad x_1' = x_1 + dx$"
+            place: (5, 16)  style { font_size: 3.0; background: "none"; }
+        M_DOTS:  note "Dots: $a, b, \ldots, z \quad 1 + 2 + \cdots + n$"
+            place: (5, 21)  style { font_size: 3.0; background: "none"; }
+
+        // ── Matrices (auto-sized delimiters) ──────────────────
+        T_MAT: note "Matrices (auto-sized delimiters)"
+            place: (5, 30)
+            style { font_size: 3.5; font_weight: "bold"; background: "none"; }
+
+        MAT_2P: note "$\begin{pmatrix} a & b \\ c & d \end{pmatrix}$"
+            place: (5, 36)  style { font_size: 3.0; background: "none"; }
+        MAT_2B: note "$\begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}$"
+            place: (5, 42)  style { font_size: 3.0; background: "none"; }
+        MAT_2V: note "$\begin{vmatrix} a & b \\ c & d \end{vmatrix}$"
+            place: (5, 48)  style { font_size: 3.0; background: "none"; }
+        MAT_3P: note "$\begin{pmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{pmatrix}$"
+            place: (5, 56)  style { font_size: 3.0; background: "none"; }
+        MAT_4B: note "$\begin{bmatrix} a & b & c & d \\ e & f & g & h \\ i & j & k & l \\ m & n & o & p \end{bmatrix}$"
+            place: (5, 68)  style { font_size: 3.0; background: "none"; }
+        MAT_5P: note "$\begin{pmatrix} 1 \\ 2 \\ 3 \\ 4 \\ 5 \end{pmatrix}$"
+            place: (5, 84)  style { font_size: 3.0; background: "none"; }
+
+        // ── Delimiter sizing ─────────────────────────────────
+        T_DELIM: note "Delimiter auto-sizing"
+            place: (55, 30)
+            style { font_size: 3.5; font_weight: "bold"; background: "none"; }
+
+        D_ABS1: note "$|x| \quad |a+b|$"
+            place: (55, 36)  style { font_size: 3.0; background: "none"; }
+        D_ABS2: note "$|\frac{a}{b}| \quad |\frac{x^2}{y}|$"
+            place: (55, 42)  style { font_size: 3.0; background: "none"; }
+        D_ABS3: note "$|\frac{1}{\frac{2}{3}}|$"
+            place: (55, 50)  style { font_size: 3.0; background: "none"; }
+
+        // ── Engineering identities ────────────────────────────
+        T_ENG: note "Engineering"
+            place: (55, 60)
+            style { font_size: 3.5; font_weight: "bold"; background: "none"; }
+
+        E_OHM:   note "$V = IR \quad P = VI = I^2 R$"
+            place: (55, 66)  style { font_size: 3.0; background: "none"; }
+        E_RC:    note "$V_C = V_0 (1 - e^{-t/\tau})$"
+            place: (55, 71)  style { font_size: 3.0; background: "none"; }
+        E_PAR:   note "$\frac{1}{R_{eq}} = \frac{1}{R_1} + \frac{1}{R_2}$"
+            place: (55, 77)  style { font_size: 3.0; background: "none"; }
+        E_DIV:   note "$V_{out} = V_{in} \cdot \frac{R_2}{R_1 + R_2}$"
+            place: (55, 84)  style { font_size: 3.0; background: "none"; }
+
+        // ── Card sizing — sticky-note background ON ───────────
+        // Same content as above but with the default sticky-note
+        // card visible. Verifies that bbox calculation grows the
+        // card to enclose every glyph (including big ascenders /
+        // descenders / numerators / denominators / big-op limits).
+        T_CARD: note "Card sizing (background ON)"
+            place: (-25, 115)
+            style { font_size: 3.5; font_weight: "bold"; }
+
+        BG_LATIN: note "Latin: $abcdefghijklmnopqrstuvwxyz$"
+            place: (-25, 122)  style { font_size: 3.0; }
+        BG_FRAC:  note "Frac: $\frac{a+b}{c-d} = \frac{x^2+1}{x-1}$"
+            place: (-25, 130)  style { font_size: 3.0; }
+        BG_SUM:   note "Sum: $\sum_{i=1}^{n} i^2 = \frac{n(n+1)(2n+1)}{6}$"
+            place: (-25, 139)  style { font_size: 3.0; }
+        BG_INT:   note "Int: $\int_0^{\infty} e^{-x^2} dx = \frac{\sqrt{\pi}}{2}$"
+            place: (-25, 148)  style { font_size: 3.0; }
+        BG_TRI:   note "Triple: $\iiint_V \nabla \cdot F \, dV = \oint_S F \cdot dA$"
+            place: (-25, 157)  style { font_size: 3.0; }
+        BG_MAT:   note "$A = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}$ identity"
+            place: (-25, 166)  style { font_size: 3.0; }
+    }
+}

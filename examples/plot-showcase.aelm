@@ -1,0 +1,65 @@
+# aelm-version: 0.4.0
+// plot-showcase — #192 Phase 4.0 demo of the plot annotation layer.
+// Shows: function traces, inline samples, dual Y axis, axis labels,
+// grid, legend. DRC and routing skip the entire `plots {}` block; the
+// rendered plots draw above notes (Stage 4.8).
+
+use "passive.alib"
+
+module PlotShowcase {
+    instances {
+        R1: Resistor(value: 10k) place: (0, 0) nc: all
+    }
+
+    plots {
+        // Function plot — sin / shifted sin.
+        P1: plot {
+            place: (15, -25)
+            size: (60, 25)
+            x: { range: 0..0.005, label: "t [ms]", scale: 1000, grid: true }
+            y: { range: -1.2..1.2, label: "V" }
+            traces {
+                sin_wave: y = sin(2*pi*1000*x) label: "Vin"
+                shifted:  y = 0.5*sin(2*pi*1000*x + 0.785) label: "Vout"
+            }
+        }
+
+        // Inline samples — bar-like response.
+        P2: plot {
+            place: (15, 5)
+            size: (60, 20)
+            x: { range: 0..4, label: "step" }
+            y: { range: 0..1.2, label: "V_out / V_in" }
+            samples: [(0, 0), (1, 0.3), (2, 0.7), (3, 0.95), (4, 1.0)]
+        }
+
+        // Dual Y axis — voltage (left, V) + current (right, mA).
+        P3: plot {
+            place: (15, 30)
+            size: (60, 25)
+            x: { range: 0..0.001, label: "t [s]", grid: true }
+            y:  { range: -5..5, label: "V" }
+            y2: { range: 0..100, label: "I [mA]", scale: 1 }
+            traces {
+                voltage: y = 5*sin(2*pi*1000*x) label: "V"
+                current: y = 50 + 30*cos(2*pi*1000*x) label: "I" y2: true
+            }
+        }
+        P_STYLED: plot {
+            place: (15, 60)
+            size: (60, 25)
+            x: { range: 0..1, label: "t" }
+            y: { range: -1..1, label: "V" }
+            style {
+                background: #fafafa;
+                border_color: #444444;
+                border_width: 0.3;
+                grid_color: #cccccc;
+                text_color: #222222;
+            }
+            traces {
+                sine: y = sin(2*pi*x) label: "Vin"
+            }
+        }
+    }
+}

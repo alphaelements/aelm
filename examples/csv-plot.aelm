@@ -1,0 +1,25 @@
+# aelm-version: 0.4.0
+// csv-plot — #192 Phase 4.0 demo of CSV-source plot traces.
+// Loads a captured waveform from `data/scope-capture.csv` and applies
+// LTTB decimation to keep the polyline snappy. The CSV file content
+// is supplied to the renderer via the same `imports.files` map the
+// parser uses for `use` statements — the IR only stores the path.
+
+use "passive.alib"
+
+module CsvPlot {
+    instances {
+        R1: Resistor(value: 10k) place: (0, 0) nc: all
+    }
+
+    plots {
+        SCOPE: plot {
+            size: (60, 25)
+            source: "data/scope-capture.csv"
+            x: { col: "time", range: 0..0.005, label: "t [s]", grid: true }
+            y: { col: "voltage", range: -1.2..1.2, label: "V" }
+            decimation: { max_points: 2000 }
+        
+            place: (3, -13)}
+    }
+}

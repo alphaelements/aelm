@@ -22,35 +22,196 @@ cut via `scripts/release.sh`.
 
 ### Added
 
-- **Annotation layer — Phase 1 (notes)** (#188 / #189). Three author
-  forms collapse onto one IR vec under `ModuleDef.notes`:
-  - `notes { N1: note "text" place: ... visible: ... style { ... } }`
-    — free-standing labels with absolute or pin-relative placement.
-  - `R1: ... note: "..."` — short inline label on an instance,
-    auto-positioned above the reference designator.
-  - `-> ... note: "..."` — inline label on a connection, drawn at the
-    routed wire's longest-segment midpoint.
-  Hidden notes (`visible: false`) emit a tiny grey placeholder circle
-  instead of text so the editor can show "there is a hidden note here"
-  without re-parsing. Inline `style { ... }` and a new stylesheet
-  `note { ... }` selector cascade onto the rendered text. Diagnostics:
-  `E_NOTE_002` / `E_NOTE_003` / `E_NOTE_004` / `E_NOTE_005`. See
-  `examples/note-showcase.aelm` and `Specification/BD-Annotation-Note`.
+- **Figure interactivity (#196).** The `figures {}` block now lights up the
+  same WebView gestures notes have had since #189: click selection with
+  source navigation, drag-to-reposition (snapped to grid; rewrites
+  `place:` / `from:` / `to:` / `center:` together so a `line` figure
+  shifts both endpoints in one call), `R` for 90° rotation, `L` for
+  lock-level toggle, `V` for visibility toggle, `Del` for deletion, and
+  a right-click menu with all of the above plus a figure-only "Toggle
+  Interactive" entry. New IR fields `visible` / `lock_level` /
+  `rotation` / `interactive` join the existing `z:` and `style {}`,
+  with the same defaults (visible/interactive: true, no lock, no rot).
+- New WASM bindings: `apply_figure_move` / `apply_figure_rotate` /
+  `apply_figure_lock` / `apply_figure_visibility` /
+  `apply_figure_interactive` / `apply_figure_delete` /
+  `get_figure_hint_value`, mirroring the note / plot reverse-sync API
+  shape.
+- New IR helpers: `figure_world_extents_indexed` (aelm-render) and
+  `build_figure_items` (aelm-render-interactive). The WASM
+  `interactive_items` projection now extends figure items so the
+  WebView actually sees them.
+
+### Changed
+
+- The renderer honours `visible: false` on figures by suppressing the
+  geometry. The InteractiveItem projection still emits a small marker
+  bbox at the figure's anchor so authors can flip visibility back on.
+
+## [0.4.0] - 2026-05-09
+
+### Added
+
+- **Plot annotation layer (`plots {}`)**. Schematics can now carry data
+  plots inline. Three trace sources are supported: function expressions
+  (`y = sin(2*pi*1000*x)`) evaluated by a small Pratt parser, CSV files
+  (`source: "data/scope.csv"` with named or indexed columns), and inline
+  sample arrays (`samples: [(x, y), ...]`). Features: dual Y axis
+  (`y2: { ... }` + per-trace `y2: true`), legend with auto-cycling 6-color
+  palette, axis labels with optional display `scale:` factor, dashed
+  grid lines per axis, and LTTB decimation (default 2000 points; 100k-row
+  CSV captures stay snappy). Plot data is evaluated once per layout
+  artifact so pan / zoom never re-runs the math layer or re-parses CSV.
+  Diagnostics: `E_PLOT_001` (duplicate id), `E_PLOT_RANGE` (missing
+  `x.range`), `E_PLOT_003` (unknown pin anchor), `E_PLOT_004` (bad
+  expression). New WASM API `list_plots(ir, files)` reports per-plot
+  metadata including the post-decimation point count. See
+  `examples/plot-showcase.aelm`, `examples/csv-plot.aelm`, and the
+  [DSL Plot wiki page](https://github.com/alphaelements/aelm/wiki/en-DSL-Plot).
+- **Plot CSV traces in WebView** (#192 follow-up). The WASM render
+  pipeline now threads a `plot_files` map alongside the layout result,
+  so `source: "data/scope.csv"` traces render in the VSCode canvas
+  exactly as they do in `aelm export-svg`. The VSCode extension scans
+  the active document for `source:` paths and reads them off disk
+  next to the parser's existing `use`-statement file map.
+- **Plot inline + external style** (#192 follow-up). Plots cascade
+  three style layers: engine defaults → external `plot { ... }`
+  pseudo-element from `.astyle` → inline `style { ... }` block on the
+  plot itself. New inline keys: `border_width`, `grid_color`,
+  `text_color`. The astyle pseudo-element reuses the standard
+  `fill_color` / `color` / `width` / `sub_color` / `font_color` /
+  `font_size` properties.
+- **Plot interactivity** (#192 follow-up). Plots are now movable and
+  lockable from the VSCode WebView. Drag rewrites `place:`, the right-
+  click Lock Level menu writes `lock:` inside the plot block body. New
+  WASM APIs: `apply_plot_move`, `apply_plot_lock`. Rotation and mirror
+  remain disabled — plot frames are axis-aligned. Implementation
+  follows the new `add-interactive-element` skill that codifies the
+  Note (#189) interactive pattern as a reusable recipe.
+- **Plot samples raw block form** (#192 follow-up). `samples: [...]`
+  now also accepts CSV-style bare `x, y` rows separated by newlines,
+  alongside the original `(x, y)` paren form. Both forms can be mixed
+  inside the same block, so authors can paste captured data without
+  reformatting it.
+
+- **Annotation layer**. Schematics can now carry text annotations and
+  decoration shapes:
+  - `notes { N1: note "..." }` blocks, plus inline `R1: ... note: "..."`
+    on instances and `-> ... note: "..."` on connections. Block-form
+    notes accept `place:` (absolute, pin-relative, or component-
+    relative), `rot:`, `lock:`, `visible:`, and an inline `style { }`
+    block that controls font_size, fill, font_weight, font_style,
+    background, and per-line text_align. Multi-line bodies use a raw
+    bracket form `note [ ... ]` — each source line becomes one
+    rendered row. The renderer draws each note as a sticky-note memo
+    card with a folded top-right corner and a theme-aware palette
+    (light pale-yellow / dark deep-slate); `style { background: "none"; }`
+    opts out of the card so text floats on the schematic. Hidden
+    notes (`visible: false`) emit a small folded-page placeholder
+    icon at the anchor.
+  - `figures { ... }` block carrying decoration shapes: line, rect,
+    circle, ellipse, arc, arrow, and text. Coordinates are integer
+    grid cells with absolute or pin-relative anchors. Inline
+    `style { stroke_color; stroke_width; fill; font_size; ... }`
+    cascades over engine defaults; numeric `z:` controls stacking
+    order. DRC and routing ignore the block. See
+    `examples/figure-showcase.aelm`.
+
+  Notes are interactive on the VSCode canvas with the same gesture
+  set as part / module instances: drag to reposition, `R` rotates,
+  `L` toggles lock, `Del` deletes, `V` toggles visibility, and right-
+  click opens a Rotate / Visibility / Lock Level / Delete menu. The
+  card, dog-ear, and glyphs rotate together; `lock:` blocks the drag
+  write-back. New stylesheet `note { ... }` pseudo-element + `aelm
+  apply-note-{move,rotate,lock,delete,toggle-visibility}` CLI
+  subcommands. See `examples/note-showcase.aelm` and the
+  [DSL Notes wiki page](https://github.com/alphaelements/aelm/wiki/en-DSL-Notes).
+
+- **Inline math layer (`$...$`)**. Text inside a note body bracketed
+  by `$ ... $` is now typeset as math instead of rendered verbatim.
+  The new `aelm-math` crate ships a build-time glyph catalogue
+  extracted from the SIL OFL-1.1 KaTeX TrueType fonts (italic Latin
+  variables, upright digits / operators / brackets / punctuation,
+  full Greek upper + lower with variants, ~50 relations and binary
+  operators, big operators with stacked / right-side limits, blackboard-
+  bold, and Caligraphic capitals — 393 glyphs at ~672 KB of Rust
+  source). The schematic backend tessellates each glyph into a
+  `RenderCommand::FilledPath` (new variant) — SVG emits a `<path>`
+  with `fill-rule="evenodd"`, the wasm Canvas backend uses
+  `Path2D` + `fill('evenodd')` via `CanvasWindingRule::Evenodd`, and
+  the native PNG backend uses `tiny_skia::FillRule::EvenOdd`, so
+  counters punch real holes consistently across all three render
+  surfaces. Supported
+  constructs: fractions, square roots, scripts, big operators with
+  limits, absolute value, matrices (`pmatrix` / `bmatrix` / `vmatrix`
+  / `Vmatrix` / `matrix`), implicit multiplication, and ~80 LaTeX
+  command aliases. Note bbox + card geometry use the math layout's
+  measured ascent / descent so fractions / sums / exponents stay
+  enclosed by the viewBox. See `examples/math-showcase.aelm` and the
+  [DSL Math wiki page](https://github.com/alphaelements/aelm/wiki/en-DSL-Math).
+  OFL-1.1 attribution is mirrored in `THIRD_PARTY_NOTICES.md`,
+  `vscode-extension/THIRD_PARTY_NOTICES.md`, and
+  `web/renderer/THIRD_PARTY_NOTICES.md`.
+
+### Fixed
+
+- **Net-tap instances accepted as annotation anchors**. `notes {}`,
+  `figures {}`, and `plots {}` placement (`place: G1.pin(...)`) now
+  correctly resolve net-tap instances (`V1: net VCC`, `G1: net GND`).
+  Previously they emitted spurious `E_NOTE_003` / `E_FIG_003` /
+  `E_PLOT_003` errors.
+- **Multiline note drag does not inject spurious `place:`**. Dragging a
+  multiline `note [ ... ]` that contains a blank line no longer inserts
+  a `place:` directive inside the bracket body. Both `locate_block_note`
+  and `update_note_place_line` now track `[ ]` bracket depth.
+- **Plot CSV WebView render** (#192). VSCode WebView no longer renders
+  CSV-source plots as empty polylines. The fix routes
+  `parse_with_imports*` file content through the layout response into
+  the render pipeline so CSV bytes reach `evaluate_plots` regardless
+  of which entry point (`render` / `export_svg` / `render_to_svg`)
+  the host calls.
+- **Math — spacing commands** (`\,`, `\;`, `\:`, `\!`, `\quad`,
+  `\qquad`) now insert the correct amount of horizontal space instead
+  of being silently ignored.
+- **Math — relation padding**. Binary relations (`=`, `\le`, `\ge`,
+  `\approx`, …) now carry 0.15 em padding on each side, matching
+  LaTeX thin-space convention.
+- **Math — fraction bar alignment**. The vinculum is drawn at the
+  math axis (half x-height above the baseline) with proper clearance
+  above numerator / below denominator; nested fractions no longer
+  drift from the axis.
+- **Math — mixed text + math baseline**. Text runs and math fences
+  on the same note line now share the alphabetic baseline instead of
+  each segment snapping to its own vertical origin.
+- **Math — sqrt sizing**. Square roots now use continuous KaTeX/RaTeX-
+  style scaling with a glyph-aware size cache, producing tighter fits
+  on nested radicals.
+- **Math — auto-sized delimiters**. Parentheses, brackets, and bars
+  on matrices and absolute-value fences scale to the content height
+  using ReX-style math-axis centering.
+- **Math — VRule bar height**. Absolute-value bars now span only the
+  actual content ascent/descent instead of forcing axis-symmetric
+  height, so `|\frac{1}{\frac{2}{3}}|` no longer extends the top bar
+  beyond the numerator.
+- **Math — integral italic correction**. `\int` and friends apply an
+  italic correction to prevent the upper limit from colliding with the
+  integral sign's top curve.
+
+### Changed
+
+- **Math — performance**. `FilledPath` render commands are replaced by
+  `MathGlyph` references with cached tessellation, eliminating
+  redundant outline expansion on every render frame.
 
 ### Internal
 
-- **Stdlib SVG snapshot regression suite** (#152). Added
-  `examples/stdlib-gallery.aelm` (21 stdlib parts on a single
-  deterministic page) plus `crates/aelm-render/tests/snapshot.rs`,
-  which renders the gallery and one solo SVG per part through the
-  same Stage 2 + Stage 3 pipeline as `aelm render` and asserts each
-  output against an `insta` snapshot under
+- **Stdlib SVG snapshot regression suite**. New
+  `examples/stdlib-gallery.aelm` (21 stdlib parts on one
+  deterministic page) plus `aelm-render` snapshot tests under
   `crates/aelm-render/tests/snapshots/`. Pin position, label anchor,
-  and viewBox regressions now surface as a CI-visible diff. Update
+  and viewBox regressions surface as a CI-visible diff. Update
   intentional changes with `INSTA_UPDATE=always cargo test -p
-  aelm-render --test snapshot`; rejected snapshots ride out of the
-  GitLab `test` job as `**/snapshots/*.snap.new` artifacts. See
-  `wiki/Reference/Dev-Environment.md` for the full workflow.
+  aelm-render --test snapshot`. See `wiki/Reference/Dev-Environment.md`.
 
 ## [0.3.4] - 2026-05-06
 
@@ -378,6 +539,11 @@ bumped together by `scripts/release.sh`.
   records the lockstep policy, the six compatibility layers, and how
   each is verified.
 
-[Unreleased]: https://github.com/alphaelements/aelm/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/alphaelements/aelm/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/alphaelements/aelm/releases/tag/v0.4.0
+[0.3.4]: https://github.com/alphaelements/aelm/releases/tag/v0.3.4
+[0.3.3]: https://github.com/alphaelements/aelm/releases/tag/v0.3.3
+[0.3.2]: https://github.com/alphaelements/aelm/releases/tag/v0.3.2
+[0.3.1]: https://github.com/alphaelements/aelm/releases/tag/v0.3.1
 [0.3.0]: https://github.com/alphaelements/aelm/releases/tag/v0.3.0
 [0.2.1]: https://github.com/alphaelements/aelm/releases/tag/v0.2.1

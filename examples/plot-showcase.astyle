@@ -1,0 +1,9 @@
+// Demo stylesheet paired with examples/plot-showcase.aelm.
+// Tests external `plot { }` pseudo-element cascade (#192 follow-up).
+// Plots with inline `style { }` (e.g. P_STYLED) win over these values.
+
+// plot {
+//     fill_color: #f0f8ff;
+//     color: #003366;
+//     sub_color: #aaccdd;
+//}
