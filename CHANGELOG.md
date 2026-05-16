@@ -20,10 +20,86 @@ cut via `scripts/release.sh`.
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-05-16
+
 ### Added
 
-- **Figure interactivity (#196).** The `figures {}` block now lights up the
-  same WebView gestures notes have had since #189: click selection with
+- **Net-tap per-tap symbol override.** Individual taps can now pick a
+  different flag glyph from the net default via
+  `G2: net GND { symbol: gnd_triangle }`, enabling mixed ground symbols
+  (e.g. signal vs chassis ground) on the same electrical net.
+- **`label_only: true` nets.** Nets declared with `label_only: true`
+  render taps as text-only labels with no flag glyph, useful for signal
+  nets like SDA/SCL that join distant pins by label only.
+- **Auto-migration of legacy flag instances.** `GND1: GND` / `VCC1: PWR`
+  style stdlib flag instances are automatically migrated into net-taps at
+  render time, so all instances sharing an inferred net name display a
+  unified label instead of per-instance IDs.
+- **Bare net-ref nearest-tap routing.** `-> GND` in connections now
+  resolves to the nearest physical tap by Manhattan distance, producing
+  correct point-to-point routing instead of ambiguous net-wide connections.
+- **Net-tap label position offset.** New body entry
+  `label_offset: (dx, dy)` shifts the rendered label by `dx` / `dy` grid
+  units from the default anchor, allowing authors to nudge labels off the
+  wire they connect to.
+- **Three-direction label text rotation for label-only taps.** When a
+  label-only tap is rotated 90° / 180° / 270°, the text itself rotates to
+  follow the wire while never appearing upside-down (0° / -90° / +90°).
+- **Interactive net-tap label drag.** The WebView emits a separate
+  draggable handle on the label so users can reposition it
+  independently of the flag glyph. Drags snap to half-pitch (0.5 grid)
+  and the result is written back to the source as `label_offset:`. The
+  R key on the label rotates the underlying tap.
+
+## [0.4.1] - 2026-05-15
+
+### Added
+
+- **`flow_node` / `block` label rendering inside the node body.** When
+  `flow_node(..., label: "X")` or `block(..., label: "X")` is declared,
+  the renderer now draws `"X"` inside the shape instead of the instance
+  identifier. ASCII and multibyte (Japanese / CJK) labels survive
+  verbatim through the parser → IR → render → SVG/Canvas pipeline. The
+  identifier is still used for `flow { A -> B }` references and DRC
+  messages — only the *drawn* text changes. Long labels can still
+  overflow the fixed bbox; auto-fit and multi-line wrapping are tracked
+  as separate follow-ups.
+- **`border_radius` for `figure_rect` + `figure { }` style cascade.**
+  `figure_rect` now accepts an inline `style { border_radius: <value>; }` (in mm
+  or as a bare number) that rounds all four corners via SVG `rx`/`ry` and a
+  manual arc path on Canvas. An external `.astyle` file can set defaults for every
+  figure in the diagram using the new `figure { }` pseudo-element:
+  ```astyle
+  figure {
+      stroke_color: #004488;
+      border_radius: 1.5mm;
+  }
+  ```
+  Inline `style {}` overrides the sheet, backward-compatible (absent/zero = sharp
+  corners, no rx/ry emitted).
+- **`polygon`/`polyline` CSV row-delimiter shorthand.** `points:`
+  now accepts bare `x, y` pairs separated by newlines (no parentheses
+  required), mirroring the `samples:` shorthand in `plots {}`. Both
+  forms are interchangeable and can be mixed in the same list.
+- **Figure polygons + vertex handles.** Three new primitives —
+  `triangle place: (x,y) size: (w,h)`, `polygon place: ... points:
+  [(dx,dy), ...]`, and `polyline from: ... points: [(dx,dy), ...]` —
+  join the seven Phase 2 shapes in the `figures {}` block. Polygons
+  and polylines store vertices as offsets from the anchor, so a
+  drag-to-move shifts the anchor only and the vertex list stays
+  byte-identical. New `apply_figure_vertex_move(source, figure_id,
+  vertex_index, new_x, new_y)` WASM API rewrites a single vertex
+  in `points: [...]`; the WebView surfaces one drag handle per vertex
+  (`InteractiveKind::FigureVertex`, ids `figure:<fid>:v<idx>`) and
+  draws them on top of every overlay so they pick up the click first.
+  `FigureStyle` gains `stroke_dash`, `stroke_cap`, and `stroke_join`;
+  the renderer now builds every figure stroke through one
+  `figure_stroke_style()` helper so a dashed rect / dotted circle /
+  rounded-cap arc all work the same way. New diagnostic `E_FIG_005`
+  rejects polygons with fewer than two points and polylines with no
+  points.
+- **Figure interactivity.** The `figures {}` block now lights up the
+  same WebView gestures notes already support: click selection with
   source navigation, drag-to-reposition (snapped to grid; rewrites
   `place:` / `from:` / `to:` / `center:` together so a `line` figure
   shifts both endpoints in one call), `R` for 90° rotation, `L` for
@@ -47,6 +123,16 @@ cut via `scripts/release.sh`.
 - The renderer honours `visible: false` on figures by suppressing the
   geometry. The InteractiveItem projection still emits a small marker
   bbox at the figure's anchor so authors can flip visibility back on.
+
+### Fixed
+
+- **Triangle vertex handle aligned with apex on odd widths (#202).**
+  Triangles with odd `size` widths (e.g. `triangle size: (3, 2)`) place
+  their apex at a half-pitch position, but the interactive handle was
+  computed with integer division (`w / 2`) and landed one half-pitch
+  to the left of the drawn vertex. The vertex-offset helper now uses
+  `f64` arithmetic so the handle bbox sits dead-centre on the apex,
+  matching where the apex is actually rendered.
 
 ## [0.4.0] - 2026-05-09
 

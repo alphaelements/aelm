@@ -1,4 +1,4 @@
-# aelm-version: 0.4.0
+# aelm-version: 0.4.1
 // plot-showcase — #192 Phase 4.0 demo of the plot annotation layer.
 // Shows: function traces, inline samples, dual Y axis, axis labels,
 // grid, legend. DRC and routing skip the entire `plots {}` block; the

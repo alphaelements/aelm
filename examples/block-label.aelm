@@ -1,0 +1,22 @@
+# aelm-version: 0.4.1
+// block label rendering demo (#172 stage 1).
+//
+// Without `label:`, the block draws its instance identifier (`MCU`).
+// With `label:`, the block draws the label text instead — useful when
+// the identifier is short for code reasons but the displayed text
+// needs to be human-readable, multilingual, or contain punctuation.
+//
+// Stage 1 limitation: bbox is still fixed and labels longer than the
+// shape may overflow. Auto-fit / wrapping is tracked as stages 2 and
+// 3 of #172.
+
+module BlockLabelDemo {
+    stereotype: block_diagram
+
+    instances {
+        MCU:     block(shape: rounded_rect, label: "STM32F4")   place: (0, 0)
+        UART:    block(shape: rect, label: "UART Driver")        place: MCU.e(6, 0)
+        JA:      block(shape: hexagon, label: "通信モジュール")   place: MCU.s(0, 6)
+        NOLABEL: block(shape: rect)                              place: UART.s(0, 6)
+    }
+}

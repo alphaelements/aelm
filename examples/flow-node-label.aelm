@@ -1,0 +1,26 @@
+# aelm-version: 0.4.1
+// flow_node label rendering demo (#172 stage 1).
+//
+// Without `label:`, the node draws its instance identifier (`STARTUP`).
+// With `label:`, the node draws the label text instead — useful when
+// the identifier is short for code reasons but the displayed text
+// needs to be human-readable, multilingual, or contain punctuation.
+//
+// Stage 1 limitation: bbox is still fixed and labels longer than the
+// shape may overflow. Auto-fit / wrapping is tracked as stages 2 and
+// 3 of #172.
+
+module FlowLabelDemo {
+    stereotype: flow_chart
+
+    instances {
+        STARTUP: flow_node(shape: start) place: (0, 0)
+        ASCII:   flow_node(shape: process, label: "Self Test") place: STARTUP.s(0, 4)
+        JA:      flow_node(shape: process, label: "セルフテスト") place: ASCII.s(0, 4)
+        DONE:    flow_node(shape: end, label: "完了") place: JA.s(0, 4)
+    }
+
+    flow {
+        STARTUP -> ASCII -> JA -> DONE
+    }
+}

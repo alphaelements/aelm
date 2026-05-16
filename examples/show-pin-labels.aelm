@@ -1,0 +1,25 @@
+# aelm-version: 0.4.1
+// Instance-level pin-label visibility (#183).
+//
+// `show_pin_labels: false` hides every pin name on the instance,
+// regardless of the symbol template's per-pin `show_label` default.
+// Without the hint, the template default is honoured (Connector*
+// ships with `show_label: true`).
+
+use "connector.alib"
+
+module PinLabelDemo {
+    instances {
+        // Template default: pin_1..pin_4 labels are visible.
+        J1: Connector4 place: (-3, -1) nc: all
+
+        // Same part, but the instance hides every label — useful when
+        // the connector pinout is documented elsewhere and the labels
+        // would otherwise clutter a dense schematic.
+        J2: Connector4 show_pin_labels: false place: J1.pin_1(9, 1) nc: all
+
+        // Explicit `true` is equivalent to omitting the hint here, but
+        // documents intent and survives future template default flips.
+        J3: Connector4 show_pin_labels: true place: J2.pin_1(9, 1) nc: all
+    }
+}

@@ -1,4 +1,4 @@
-# aelm-version: 0.4.0
+# aelm-version: 0.4.1
 // csv-plot — #192 Phase 4.0 demo of CSV-source plot traces.
 // Loads a captured waveform from `data/scope-capture.csv` and applies
 // LTTB decimation to keep the polyline snappy. The CSV file content

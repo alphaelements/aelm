@@ -1,5 +1,5 @@
-# aelm-version: 0.4.0
-// figure-showcase — #190 Phase 2.0 demo of all 7 figure primitives.
+# aelm-version: 0.4.1
+// figure-showcase — #190 Phase 2.0 demo of all figure primitives.
 // Shows: line / figure_rect / circle / ellipse / arc / arrow / figure_text
 // plus z-order + inline style cascade. DRC and routing skip the entire
 // `figures {}` block; the rendered shapes draw behind wires + symbols
@@ -10,6 +10,17 @@
 // (visible: true, interactive: true, no lock, no rotation), so this
 // showcase renders identically — but the WebView gets the full gesture
 // surface (click select, drag, R / L / V / Del, right-click menu).
+//
+// #195: `border_radius` style property for figure_rect. Add a `figure { }`
+// block in a companion `.astyle` file to cascade defaults across all figures:
+//
+//   figure {
+//     stroke_color: #004488;
+//     border_radius: 1.5mm;
+//   }
+//
+// All figure_rect elements inherit those defaults unless they override with
+// their own inline `style { }` block.
 
 use "passive.alib"
 
@@ -47,6 +58,37 @@ module FigureShowcase {
         // An annotation arrow pointing at R1.p2.
         AR1: arrow from: (3, -2) to: R1.p2(0, 0)
             style { stroke_color: "#cc0000"; stroke_width: 0.25; }
+
+        // #197: triangle / polygon / polyline primitives + dashed
+        // strokes. Triangle is an isosceles triangle inscribed in a
+        // (w, h) box; polygon points are relative offsets from
+        // `place:`; polyline is an open path with the new
+        // `stroke_dash` / `stroke_cap` / `stroke_join` style fields.
+        TRI: triangle place: (20, -3) size: (3, 2)
+            style { stroke_color: "#cc6600"; fill: "#ffe5cc"; }
+
+        DIAMOND: polygon place: (24, -3) points: [
+            (1, 0),
+            (2, 1),
+            (1, 2),
+            (0, 1),
+        ]
+            style { stroke_color: "#0066cc"; fill: "#e8f0ff"; }
+
+        WAVE: polyline from: R2.p2(2, 0) points: [(1, -1), (2, 1), (3, -1), (4, 1)]
+            style {
+                stroke_color: "#666666";
+                stroke_width: 0.25;
+                stroke_dash: "1 1";
+                stroke_cap: "round";
+            }
+
+        // #195: rounded rects with border_radius property.
+        LABEL_BOX: figure_rect place: (20, 5) size: (8, 4)
+            style { stroke_color: "#0066cc"; fill: "#e8f0ff"; border_radius: 1.5; }
+
+        BADGE: figure_rect place: (30, 5) size: (6, 4)
+            style { stroke_color: "#cc6600"; stroke_width: 0.4; fill: "#fff3e0"; border_radius: 2.0; }
 
         // Section title (in front of the frame thanks to default z=0
         // sort being stable + position).
