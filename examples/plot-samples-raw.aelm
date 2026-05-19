@@ -1,0 +1,23 @@
+# aelm-version: 0.4.2
+// plot-samples-raw — Bare x,y sample form without parentheses.
+// Authors can paste CSV-like rows directly between [ and ].
+
+module PlotSamplesRaw {
+    plots {
+        STEPS: plot {
+            place: (0, 0)
+            size: (60, 25)
+            x: { range: 0..6, label: "step", grid: true }
+            y: { range: 0..1.2, label: "y" }
+            samples: [
+                0, 0
+                1, 0.3
+                2, 0.55
+                3, 0.78
+                4, 0.92
+                5, 1.0
+                6, 1.0
+            ]
+        }
+    }
+}

@@ -20,10 +20,53 @@ cut via `scripts/release.sh`.
 
 ## [Unreleased]
 
-## [0.4.2] - 2026-05-16
+## [0.4.2] - 2026-05-19
 
 ### Added
 
+- **Parametric curves, patterns, and mirror figures.** New
+  `parametric`, `pattern`, and `mirror` figure kinds extend the
+  `figures {}` block. Parametric curves accept `x:` / `y:` expressions
+  in `t` (with `sin`, `cos`, `pow`, `atan2`, `min`, `max`, `abs`,
+  `sqrt`, `exp`, `log`) sampled over a `t: (start, end, step)` range
+  and rendered as polylines or dot clouds (`connect: line | none`).
+  Patterns replicate a source figure on a `rotate:` or `axis_replicate:`
+  (grid) axis. Mirrors emit a reflected copy across `axis: x` /
+  `axis: y` or an arbitrary `axis_line: from (x1,y1) to (x2,y2)`. Source
+  figure `place:` offsets propagate through mirror expansion so
+  reflected copies follow the source when it moves. Expanded copies
+  (`<id>#<n>`) advertise `Movable`, `Lockable`, `Highlightable`, and
+  `ToggleVisibility` capabilities; dragging shifts the mirror metadata's
+  `place:` so the reflection tracks the new position. Hovering an
+  expanded mirror copy draws the mirror axis as a dashed guide line
+  (vertical for `axis: x`, horizontal for `axis: y`).
+- **Half-grid snapping for figure placement.** Figure `place:` and
+  WebView drag output now snap to 1.27 mm half-grid steps, written
+  back as 0.5-step full-grid units (e.g. `place: (2.5, 1)`). Figure
+  grammar coordinates accept floats so authors can hand-write
+  half-grid positions.
+- **`aelm.zoomToFit` command** centres and scales the WebView so the
+  whole circuit fits with a 10% margin. Available from the command
+  palette, the editor title-bar (screen-full icon), the canvas
+  overlay button, and the `Ctrl+0` / `Cmd+0` keybinding. Works across
+  `circuit`, `block_diagram`, and `flow_chart` modules. Backed by a
+  new `compute_world_bounds` helper in `aelm-render` that aggregates
+  components, routed wires, notes, figures, and plots.
+- **`aelm.resetZoom` command** restores the viewport to the default
+  centre (0, 0) at 15 px/mm — the same state a freshly-opened editor
+  starts in. Available from the command palette, the editor title-bar
+  (zoom-out icon), the canvas overlay button, and the
+  `Ctrl+Shift+0` / `Cmd+Shift+0` keybinding.
+- **`get_circuit_bounds` WASM API** returns the world-space bbox of a
+  laid-out module, consumed by the VSCode `zoomToFit` command and
+  available to any other host (npm renderer, screenshot scripts).
+- **PNG export via Canvas API.** `AELM: Export as PNG` now rasterizes
+  the SVG through the WebView Canvas at 2× resolution instead of
+  showing "not available". Default file name is derived from the
+  active `.aelm` document.
+- **`max_pixels` export option.** `ExportConfig` accepts a
+  `max_pixels` cap (default 8910 = A2 landscape at 15 px/mm) to
+  prevent oversized SVG/PNG output on large diagrams.
 - **Net-tap per-tap symbol override.** Individual taps can now pick a
   different flag glyph from the net default via
   `G2: net GND { symbol: gnd_triangle }`, enabling mixed ground symbols
@@ -50,6 +93,41 @@ cut via `scripts/release.sh`.
   independently of the flag glyph. Drags snap to half-pitch (0.5 grid)
   and the result is written back to the source as `label_offset:`. The
   R key on the label rotates the underlying tap.
+
+### Fixed
+
+- **Figure bbox offset pitch matches render.** Interactive hit-test
+  boxes on figures with a `place:` offset now line up with the drawn
+  geometry — they previously used a different pitch from the renderer,
+  making offset figures hard to click.
+- **Mirror axis reference line direction.** Hovering an expanded mirror
+  copy now draws a *vertical* dashed line for `axis: x` (the line the
+  reflection mirrors across) and a *horizontal* line for `axis: y`. The
+  previous build drew them swapped.
+- **Figure-grammar accepts float coordinates** (e.g. `place: (2.5, 1)`)
+  so half-grid placements can be hand-written without the parser
+  rejecting the source.
+- **CSV plot traces now render in the WebView.** Files with
+  `plots { source: "..." }` but no `use` statements triggered an
+  early-return in `resolveImports`, causing the pipeline to skip
+  `parse_with_imports_v2` and lose the CSV file map. The axis frame
+  rendered but the waveform polyline was missing.
+- **SVG / PNG exports include CSV plot traces.** The `exportSvg`
+  path used `parse()` instead of `parse_with_imports_v2()`, so CSV
+  data never reached the renderer. Imports are now resolved before
+  export.
+- **PNG export no longer times out on large diagrams.** Canvas
+  dimensions are capped at 8192 px per axis (scaled proportionally)
+  and the rasterization timeout is increased from 10 s to 30 s.
+
+### Changed
+
+- **Examples and tips cleaned up.** Removed unnecessary `use` and
+  dummy `Resistor` instances from plot-only / figure-only files.
+  Aligned `aelm-version` headers and library metadata to 0.4.2.
+  Added gallery files for parametric curves and plot samples.
+- **Marketplace preview flag removed.** The extension is no longer
+  marked as "Preview" on the VS Code Marketplace.
 
 ## [0.4.1] - 2026-05-15
 
@@ -126,6 +204,16 @@ cut via `scripts/release.sh`.
 
 ### Fixed
 
+- **SVG / PNG exports no longer clip notes and figures** anchored
+  outside the component bbox. `aelm-wasm`'s previous
+  `compute_bounds_from_layout` ignored wires / notes / figures; it now
+  shares the unified `compute_world_bounds` implementation with the
+  CLI exporter.
+- **SVG export renders at readable size.** `width` / `height`
+  attributes now use 15 px/mm instead of mm units, so exported SVGs
+  display at a practical size in browsers and Markdown previews.
+- **SVG / PNG save dialog pre-fills the file name** from the active
+  `.aelm` document (e.g. `amplifier.aelm` → `amplifier.svg`).
 - **Triangle vertex handle aligned with apex on odd widths (#202).**
   Triangles with odd `size` widths (e.g. `triangle size: (3, 2)`) place
   their apex at a half-pitch position, but the interactive handle was
@@ -625,7 +713,9 @@ bumped together by `scripts/release.sh`.
   records the lockstep policy, the six compatibility layers, and how
   each is verified.
 
-[Unreleased]: https://github.com/alphaelements/aelm/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/alphaelements/aelm/compare/v0.4.2...HEAD
+[0.4.2]: https://github.com/alphaelements/aelm/releases/tag/v0.4.2
+[0.4.1]: https://github.com/alphaelements/aelm/releases/tag/v0.4.1
 [0.4.0]: https://github.com/alphaelements/aelm/releases/tag/v0.4.0
 [0.3.4]: https://github.com/alphaelements/aelm/releases/tag/v0.3.4
 [0.3.3]: https://github.com/alphaelements/aelm/releases/tag/v0.3.3

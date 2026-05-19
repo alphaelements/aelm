@@ -1,0 +1,34 @@
+# aelm-version: 0.4.2
+// plot-dual-axis — Demonstrates dual Y-axis plotting for simultaneous
+// voltage/current visualization, a common need in power electronics
+// and amplifier design.
+
+module PlotDualAxis {
+    plots {
+        // Power stage output: voltage on left axis, current on right.
+        P_POWER: plot {
+            place: (15, -20)
+            size: (70, 30)
+            x: { range: 0..0.02, label: "t [ms]", scale: 1000, grid: true }
+            y:  { range: -15..15, label: "V_out [V]", grid: true }
+            y2: { range: -0.15..0.15, label: "I_out [A]" }
+            traces {
+                voltage: y = 12*sin(2*pi*50*x) label: "V"
+                current: y = 0.12*sin(2*pi*50*x) label: "I" y2: true
+            }
+        }
+
+        // Phase relationship — two signals with phase difference.
+        P_PHASE: plot {
+            place: (15, 15)
+            size: (70, 30)
+            x: { range: 0..0.01, label: "t [ms]", scale: 1000, grid: true }
+            y:  { range: -1.2..1.2, label: "input" }
+            y2: { range: -2.5..2.5, label: "output" }
+            traces {
+                input:  y = sin(2*pi*100*x)                    label: "V_in"
+                output: y = 2*sin(2*pi*100*x + 1.047)          label: "V_out (x2, +60deg)" y2: true
+            }
+        }
+    }
+}

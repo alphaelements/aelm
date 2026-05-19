@@ -1,0 +1,46 @@
+# aelm-version: 0.4.2
+// plot-functions — Demonstrates various mathematical functions available
+// in the aelm plot system. Shows sin, cos, exp, sqrt, and composite
+// waveforms common in electronics (exponential decay, square-wave
+// approximation via Fourier series).
+
+module PlotFunctions {
+    plots {
+        // Exponential decay — typical RC discharge.
+        P_DECAY: plot {
+            place: (0, 0)
+            size: (60, 25)
+            x: { range: 0..0.005, label: "t [ms]", scale: 1000, grid: true }
+            y: { range: 0..5.5, label: "V", grid: true }
+            traces {
+                discharge: y = 5*exp(-1000*x)          label: "RC decay"
+                charge:    y = 5*(1 - exp(-1000*x))    label: "RC charge"
+            }
+        }
+
+        // Square wave approximation — first 5 harmonics of Fourier series.
+        P_SQUARE: plot {
+            place: (0, 30)
+            size: (60, 25)
+            x: { range: 0..0.004, label: "t [ms]", scale: 1000, grid: true }
+            y: { range: -1.5..1.5, label: "V" }
+            traces {
+                fundamental: y = sin(2*pi*250*x) label: "1st"
+                approx3:     y = sin(2*pi*250*x) + sin(2*pi*750*x)/3 label: "1st+3rd"
+                approx5:     y = sin(2*pi*250*x) + sin(2*pi*750*x)/3 + sin(2*pi*1250*x)/5 label: "1st+3rd+5th"
+            }
+        }
+
+        // Damped oscillation — typical underdamped RLC step response.
+        P_DAMPED: plot {
+            place: (0, 60)
+            size: (60, 25)
+            x: { range: 0..0.01, label: "t [ms]", scale: 1000, grid: true }
+            y: { range: -1.2..1.5, label: "V" }
+            traces {
+                damped: y = exp(-300*x)*sin(2*pi*500*x) label: "underdamped"
+                env_hi: y = exp(-300*x) label: "envelope"
+            }
+        }
+    }
+}

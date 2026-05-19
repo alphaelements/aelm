@@ -1,26 +1,7 @@
-# aelm-version: 0.4.1
-// figure-showcase — #190 Phase 2.0 demo of all figure primitives.
-// Shows: line / figure_rect / circle / ellipse / arc / arrow / figure_text
-// plus z-order + inline style cascade. DRC and routing skip the entire
-// `figures {}` block; the rendered shapes draw behind wires + symbols
-// by default (Stage 1.5).
-//
-// #196: every figure now picks up the same `lock:` / `rot:` / `visible:` /
-// `interactive:` hints notes already had. The default stays unchanged
-// (visible: true, interactive: true, no lock, no rotation), so this
-// showcase renders identically — but the WebView gets the full gesture
-// surface (click select, drag, R / L / V / Del, right-click menu).
-//
-// #195: `border_radius` style property for figure_rect. Add a `figure { }`
-// block in a companion `.astyle` file to cascade defaults across all figures:
-//
-//   figure {
-//     stroke_color: #004488;
-//     border_radius: 1.5mm;
-//   }
-//
-// All figure_rect elements inherit those defaults unless they override with
-// their own inline `style { }` block.
+# aelm-version: 0.4.2
+// figure-showcase — All figure primitives: line, rect, circle, ellipse,
+// arc, arrow, text, triangle, polygon, polyline. Demonstrates z-order,
+// inline style cascade, lock, rounded corners, and dashed strokes.
 
 use "passive.alib"
 
@@ -59,11 +40,6 @@ module FigureShowcase {
         AR1: arrow from: (3, -2) to: R1.p2(0, 0)
             style { stroke_color: "#cc0000"; stroke_width: 0.25; }
 
-        // #197: triangle / polygon / polyline primitives + dashed
-        // strokes. Triangle is an isosceles triangle inscribed in a
-        // (w, h) box; polygon points are relative offsets from
-        // `place:`; polyline is an open path with the new
-        // `stroke_dash` / `stroke_cap` / `stroke_join` style fields.
         TRI: triangle place: (20, -3) size: (3, 2)
             style { stroke_color: "#cc6600"; fill: "#ffe5cc"; }
 
@@ -83,7 +59,6 @@ module FigureShowcase {
                 stroke_cap: "round";
             }
 
-        // #195: rounded rects with border_radius property.
         LABEL_BOX: figure_rect place: (20, 5) size: (8, 4)
             style { stroke_color: "#0066cc"; fill: "#e8f0ff"; border_radius: 1.5; }
 

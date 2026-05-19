@@ -1,16 +1,9 @@
-# aelm-version: 0.4.1
-// plot-showcase — #192 Phase 4.0 demo of the plot annotation layer.
-// Shows: function traces, inline samples, dual Y axis, axis labels,
-// grid, legend. DRC and routing skip the entire `plots {}` block; the
-// rendered plots draw above notes (Stage 4.8).
-
-use "passive.alib"
+# aelm-version: 0.4.2
+// plot-showcase — Demo of the plot annotation layer.
+// Function traces, inline samples, dual Y axis, axis labels, grid,
+// legend, and inline styling.
 
 module PlotShowcase {
-    instances {
-        R1: Resistor(value: 10k) place: (0, 0) nc: all
-    }
-
     plots {
         // Function plot — sin / shifted sin.
         P1: plot {

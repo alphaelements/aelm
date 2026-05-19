@@ -1,0 +1,59 @@
+# aelm-version: 0.4.2
+// figure-parametric-gallery — Parametric curves, pattern replication,
+// and mirror transformations. Showcases the full generative geometry
+// toolkit available in the figures {} block.
+
+module FigureParametricGallery {
+    figures {
+        // --- Parametric curves ---
+
+        SIN1: parametric x: "10 * t" y: "5 * sin(t)" t: (0, 6.28, 0.05) connect: line
+            style { stroke_color: "#cc6600"; }
+            place: (0, 0)
+
+        CIRCLE1: parametric x: "cos(t)" y: "sin(t)" t: (0, 6.28, 0.1) connect: line
+            style { stroke_color: "#0066cc"; }
+            place: (1.5, 7)
+
+        DOTS: parametric x: "t" y: "t * t / 10" t: (0, 5, 0.2) connect: none
+            style { stroke_color: "#009900"; }
+            place: (4.5, 6)
+
+        LISSAJOUS: parametric x: "5 * sin(3 * t)" y: "5 * cos(2 * t)" t: (0, 6.28, 0.02) connect: line
+            style { stroke_color: "#990099"; stroke_width: 0.3; }
+            place: (20, 7)
+
+        // --- Pattern replication ---
+
+        PETAL: circle place: (40, 2) radius: 2
+            style { stroke_color: "#cc0000"; fill: "#ffcccc"; }
+
+        RING: pattern source: PETAL rotate_around: (35, 2) count: 8 step_deg: 45
+
+        TILE: circle place: (45, 10) radius: 1
+            style { stroke_color: "#0000cc"; fill: "#ccccff"; }
+
+        GRID: pattern source: TILE axis_replicate: (count_x: 4, count_y: 3, dx: 5, dy: 5)
+
+        // --- Mirror transformations ---
+
+        WAVE: parametric x: "t" y: "3 * sin(t)" t: (0, 6.28, 0.05) connect: line
+            style { stroke_color: "#006600"; }
+            place: (0, 22)
+
+        MR_X: mirror source: WAVE axis: x
+            style { stroke_color: "#cc0000"; }
+
+        MR_Y: mirror source: WAVE axis: y
+            style { stroke_color: "#0000cc"; }
+
+        ARC1: arc center: (12, 24) radius: 3 from_deg: 0 sweep_deg: 90
+            style { stroke_color: "#cc6600"; }
+
+        ML_H: mirror source: ARC1 axis_line: from (0, 27) to (20, 27)
+            style { stroke_color: "#cc0066"; }
+
+        ML_D: mirror source: ARC1 axis_line: from (0, 22) to (10, 32)
+            style { stroke_color: "#9900cc"; }
+    }
+}

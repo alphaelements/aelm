@@ -1,0 +1,29 @@
+# aelm-version: 0.4.2
+
+// title: Plot Styling — Dark Theme
+// topic: dsl-annotation
+// tags: #AELM #EDA #DSL #Tutorial #Plots #Style
+// hint: Plots support inline styling to match your documentation theme. Use the `style {}` block on the plot for background/border/grid colors, and per-trace `style {}` for stroke color, width, and dash patterns. Perfect for dark-themed datasheets or presentations.
+
+module PlotStylingTip {
+    plots {
+        P_DARK: plot {
+            place: (0, 0)
+            size: (60, 25)
+            x: { range: 0..0.005, label: "t [ms]", scale: 1000, grid: true }
+            y: { range: -1.2..1.2, label: "V", grid: true }
+            style {
+                background: #1e1e2e;
+                border_color: #45475a;
+                border_width: 0.3;
+                grid_color: #313244;
+                text_color: #cdd6f4;
+                font_size: 1.6;
+            }
+            traces {
+                ch1: y = sin(2*pi*1000*x) label: "CH1" style { stroke_color: "#89b4fa"; stroke_width: 0.3; }
+                ch2: y = 0.6*sin(2*pi*1000*x + 0.785) label: "CH2" style { stroke_color: "#f38ba8"; stroke_width: 0.3; dash: "3 1.5"; }
+            }
+        }
+    }
+}

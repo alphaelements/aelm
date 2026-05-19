@@ -1,0 +1,25 @@
+# aelm-version: 0.4.2
+
+// title: Parametric Curves, Patterns & Mirrors
+// topic: dsl-annotation
+// tags: #AELM #EDA #DSL #Tutorial #Figures #Parametric #Pattern #Mirror
+// hint: The `parametric` figure draws mathematical curves from x(t), y(t) expressions — circles, Lissajous, spirals, anything. `pattern` replicates a source figure in rings or grids. `mirror` flips a figure across an axis or arbitrary line. Combine all three to build complex decorative geometry without manual coordinate math.
+
+module ParametricCurvesTip {
+    figures {
+        LISSAJOUS: parametric x: "5 * sin(3 * t)" y: "5 * cos(2 * t)" t: (0, 6.28, 0.02) connect: line
+            style { stroke_color: "#990099"; stroke_width: 0.3; }
+            place: (0, 0)
+
+        PETAL: circle place: (20, 2) radius: 1.5
+            style { stroke_color: "#cc0000"; fill: "#ffcccc"; }
+
+        FLOWER: pattern source: PETAL rotate_around: (17, 2) count: 6 step_deg: 60
+
+        ARC_SRC: arc center: (33, 2) radius: 3 from_deg: 0 sweep_deg: 120
+            style { stroke_color: "#0066cc"; stroke_width: 0.3; }
+
+        ARC_MIRROR: mirror source: ARC_SRC axis: x
+            style { stroke_color: "#cc6600"; }
+    }
+}

@@ -1,0 +1,19 @@
+# aelm-version: 0.4.2
+
+// title: CSV Data Plotting
+// topic: dsl-annotation
+// tags: #AELM #EDA #DSL #Tutorial #Plots #CSV #Decimation
+// hint: Import real measurement data directly onto your schematic. The `source:` property loads a CSV file, `col:` selects which column to plot, and `decimation:` keeps rendering fast even with 100k+ data points (LTTB algorithm preserves waveform shape). Great for overlaying oscilloscope captures next to the circuit that produced them.
+
+module CsvPlotTip {
+    plots {
+        CAPTURED: plot {
+            place: (15, -15)
+            size: (60, 25)
+            source: "data/scope-capture.csv"
+            x: { col: "time", range: 0..0.005, label: "t [s]", grid: true }
+            y: { col: "voltage", range: -1.2..1.2, label: "V [measured]" }
+            decimation: { max_points: 200 }
+        }
+    }
+}

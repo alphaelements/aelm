@@ -1,0 +1,146 @@
+# aelm-version: 0.4.2
+
+// title: Plot Gallery — Every Plot Feature in One File
+// topic: dsl-annotation
+// tags: #AELM #EDA #DSL #Tutorial #Plots #Gallery #DualAxis #Samples #Style
+// hint: A comprehensive gallery of the plot annotation layer. Covers function traces (sin, exp, Fourier series), dual Y-axis, inline sample points, raw sample form, and inline styling — all in a single file with no circuit instances. Copy any plot block into your own schematic as a starting point.
+
+module PlotGallery {
+    plots {
+        // --- Function traces: RC decay & charge ---
+        P_DECAY: plot {
+            place: (0, 0)
+            size: (60, 25)
+            x: { range: 0..0.005, label: "t [ms]", scale: 1000, grid: true }
+            y: { range: 0..5.5, label: "V", grid: true }
+            traces {
+                discharge: y = 5*exp(-1000*x)          label: "RC decay"
+                charge:    y = 5*(1 - exp(-1000*x))    label: "RC charge"
+            }
+        }
+
+        // --- Fourier series: square wave approximation ---
+        P_SQUARE: plot {
+            place: (0, 30)
+            size: (60, 25)
+            x: { range: 0..0.004, label: "t [ms]", scale: 1000, grid: true }
+            y: { range: -1.5..1.5, label: "V" }
+            traces {
+                fundamental: y = sin(2*pi*250*x) label: "1st"
+                approx3:     y = sin(2*pi*250*x) + sin(2*pi*750*x)/3 label: "1st+3rd"
+                approx5:     y = sin(2*pi*250*x) + sin(2*pi*750*x)/3 + sin(2*pi*1250*x)/5 label: "1st+3rd+5th"
+            }
+        }
+
+        // --- Damped oscillation: underdamped RLC ---
+        P_DAMPED: plot {
+            place: (0, 60)
+            size: (60, 25)
+            x: { range: 0..0.01, label: "t [ms]", scale: 1000, grid: true }
+            y: { range: -1.2..1.5, label: "V" }
+            traces {
+                damped: y = exp(-300*x)*sin(2*pi*500*x) label: "underdamped"
+                env_hi: y = exp(-300*x) label: "envelope"
+            }
+        }
+
+        // --- Dual Y-axis: voltage + current ---
+        P_POWER: plot {
+            place: (70, 0)
+            size: (60, 25)
+            x: { range: 0..0.02, label: "t [ms]", scale: 1000, grid: true }
+            y:  { range: -15..15, label: "V_out [V]", grid: true }
+            y2: { range: -0.15..0.15, label: "I_out [A]" }
+            traces {
+                voltage: y = 12*sin(2*pi*50*x) label: "V"
+                current: y = 0.12*sin(2*pi*50*x) label: "I" y2: true
+            }
+        }
+
+        // --- Dual Y-axis: phase difference ---
+        P_PHASE: plot {
+            place: (70, 30)
+            size: (60, 25)
+            x: { range: 0..0.01, label: "t [ms]", scale: 1000, grid: true }
+            y:  { range: -1.2..1.2, label: "input" }
+            y2: { range: -2.5..2.5, label: "output" }
+            traces {
+                input:  y = sin(2*pi*100*x)                    label: "V_in"
+                output: y = 2*sin(2*pi*100*x + 1.047)          label: "V_out (x2, +60deg)" y2: true
+            }
+        }
+
+        // --- Inline samples: step response ---
+        P_STEPS: plot {
+            place: (70, 60)
+            size: (60, 20)
+            x: { range: 0..4, label: "step" }
+            y: { range: 0..1.2, label: "V_out / V_in" }
+            samples: [(0, 0), (1, 0.3), (2, 0.7), (3, 0.95), (4, 1.0)]
+        }
+
+        // --- Raw samples: bare x,y form ---
+        P_RAW: plot {
+            place: (70, 85)
+            size: (60, 20)
+            x: { range: 0..6, label: "step", grid: true }
+            y: { range: 0..1.2, label: "y" }
+            samples: [
+                0, 0
+                1, 0.3
+                2, 0.55
+                3, 0.78
+                4, 0.92
+                5, 1.0
+                6, 1.0
+            ]
+        }
+
+        // --- Styled: dark theme ---
+        P_DARK: plot {
+            place: (0, 90)
+            size: (60, 25)
+            x: { range: 0..0.005, label: "t [ms]", scale: 1000, grid: true }
+            y: { range: -1.2..1.2, label: "V", grid: true }
+            style {
+                background: #1e1e2e;
+                border_color: #45475a;
+                border_width: 0.3;
+                grid_color: #313244;
+                text_color: #cdd6f4;
+            }
+            traces {
+                ch1: y = sin(2*pi*1000*x) label: "CH1" style { stroke_color: "#89b4fa"; stroke_width: 0.3; }
+                ch2: y = 0.6*sin(2*pi*1000*x + 0.785) label: "CH2" style { stroke_color: "#f38ba8"; stroke_width: 0.3; dash: "3 1.5"; }
+            }
+        }
+
+        // --- Styled: light custom ---
+        P_LIGHT: plot {
+            place: (0, 120)
+            size: (60, 25)
+            x: { range: 0..1, label: "t" }
+            y: { range: -1..1, label: "V" }
+            style {
+                background: #fafafa;
+                border_color: #444444;
+                border_width: 0.3;
+                grid_color: #cccccc;
+                text_color: #222222;
+            }
+            traces {
+                sine: y = sin(2*pi*x) label: "Vin"
+            }
+        }
+
+        // --- CSV source: oscilloscope capture ---
+        P_CSV: plot {
+            place: (70, 110)
+            size: (60, 25)
+            source: "data/scope-capture.csv"
+            x: { col: "time", range: 0..0.005, label: "t [s]", grid: true }
+            y: { col: "voltage", range: -1.2..1.2, label: "V [measured]" }
+            decimation: { max_points: 200 }
+        }
+    }
+}
