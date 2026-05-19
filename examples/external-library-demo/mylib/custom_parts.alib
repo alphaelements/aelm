@@ -4,7 +4,7 @@ library {
     version: "0.1.0"
     license: "MIT"
     authors: ["AELM Demo"]
-    aelm_version: ">=0.5.0"
+    aelm_version: ">=0.4.2"
 }
 
 // A couple of part definitions that reuse built-in symbols; the goal of

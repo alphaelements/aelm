@@ -12,7 +12,7 @@ library {
     version: "0.2.0"
     license: "MIT"
     authors: ["AELM Demo"]
-    aelm_version: ">=0.5.0"
+    aelm_version: ">=0.4.2"
 }
 
 // A zig-zag resistor drawn entirely with the 7 DrawCommand primitives.
