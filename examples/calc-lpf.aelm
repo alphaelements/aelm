@@ -1,0 +1,80 @@
+# aelm-version: 0.5.0
+// calc-lpf — Interactive RC low-pass filter with calc + plots.
+//
+// Mirrors the okawa-denshi RC LPF calculator layout:
+//   Vin ─── R1 ──┬── Vout
+//                 │
+//                 C1
+//                 │
+//                GND
+//
+// Editable variable boxes (R, C) let the user tweak component values
+// in the WebView. The cutoff frequency formula updates instantly, and
+// the Bode magnitude / step response plots redraw using the new
+// values without re-parsing or re-laying out the schematic.
+
+use "stdlib/parts/passive.alib"
+use "stdlib/parts/power.alib"
+use "stdlib/parts/signal.alib"
+
+module LPF_Calculator {
+    nets {
+        Vin:  input  { symbol: signal_label_input }
+        Vout: output { symbol: signal_label_output }
+        GND:  ground { symbol: gnd_flag }
+    }
+
+    instances {
+        R1:   Resistor   place: (0, 0)
+        C1:   Capacitor  place: R1.p2(2, 3) rot: 90
+        VIN:  net Vin    place: R1.p1(-3, 0)
+        VOUT: net Vout   place: R1.p2(5, 0) rot: 180
+        G1:   net GND    place: C1.p2(0, 2)
+    }
+
+    connections {
+        VIN.pin -> R1.p1
+        R1.p2   -> C1.p1
+        R1.p2   -> VOUT.pin
+        C1.p2   -> G1.pin
+    }
+
+    calcs {
+        R: var 10k type: Ohm   place: (-2, -5) label_pos: left
+            style { font_size: 2.0; }
+        C: var 100n type: Farad place: (8, -5)  label_pos: left
+            style { font_size: 2.0; }
+
+        fc: formula "1 / (2 * pi * R * C)"
+            display: "$f_c = {fc}$ Hz"
+            place: (15, 3)
+            style { font_size: 2.2; }
+
+        omega: formula "2 * pi * fc"
+            display: "$\omega_c = {omega}$ rad/s"
+            place: (15, 5)
+            style { font_size: 2.2; }
+    }
+
+    plots {
+        BODE_MAG: plot {
+            place: (-7, 7)
+            size: (30, 15)
+            x: { range: fc / 100 .. fc * 100, label: "Frequency [Hz]", log: true, grid: true, sub: true }
+            y: { range: -40 .. 5, label: "Gain [dB]", grid: true, sub: 5 }
+            traces {
+                mag: y = 20 * log(1 / sqrt(1 + (x / fc) ^ 2)) label: "|H(f)|"
+            }
+        }
+
+        STEP_RESPONSE: plot {
+            place: (-7, 23)
+            size: (30, 15)
+            x: { range: 0 .. 5 / (2 * pi * fc), label: "Time [s]", grid: true }
+            y: { range: 0 .. 1.2, label: "Vout/Vin", grid: true }
+            traces {
+                step: y = 1 - exp(-x / (R * C)) label: "Step Response"
+            }
+        }
+    }
+}

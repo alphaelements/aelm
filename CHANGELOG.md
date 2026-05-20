@@ -20,6 +20,142 @@ cut via `scripts/release.sh`.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-05-20
+
+### Added
+
+- **Interactive `calcs {}` block.** A new annotation kind that
+  embeds editable variables and live formula results directly on
+  the schematic canvas. Variables (`R: var 10k type: Ohm`) render as
+  bordered text-input boxes; formulas (`fc: formula "1/(2*pi*R*C)"
+  display: "$f_c = {fc}$ Hz"`) compute against the current variable
+  environment and re-typeset their KaTeX `$...$` math fences through
+  the same glyph pipeline as notes. Editing a variable in the
+  WebView updates the source `var` value and re-evaluates dependent
+  formulas without re-running parse / layout / routing. Chained
+  formulas resolve through dependency-ordered evaluation; cycles,
+  duplicate ids, unknown identifiers, and malformed expressions
+  surface as `E_CALC_001`–`E_CALC_006` diagnostics. Variable and
+  formula entries can be dragged, locked at any `lock:` level,
+  hidden via `visible: false`, and deleted from the canvas;
+  reverse-sync writes preserve indentation and adjacent hints.
+  Example: `examples/calc-lpf.aelm` (RC low-pass cut-off frequency
+  + ω calculator).
+- **Circuit analysis commands.** Five new read-only `aelm analyze`
+  subcommands surface project structure for tooling and agents.
+  `aelm analyze summary` reports per-module instance / connection / net
+  counts, the parts used (with category and quantity), a DRC error /
+  warning summary, and a complexity estimate. `aelm analyze netlist`
+  extracts the net connectivity graph — each net's name, electrical
+  type, and member pins — derived from the union-find net map.
+  `aelm analyze bom` generates a bill of materials grouped by part and
+  value, with reference designators, footprint, and quantity.
+  `aelm analyze connectivity` reports isolated instances and per-net
+  fan-out. `aelm analyze extract --instances A,B,C` emits a standalone
+  module containing only the requested instances and their mutual
+  connections. All accept a file path or `--stdin` and honor the unified
+  `--json` envelope.
+- **Part, symbol, and example discovery commands.** Three new CLI
+  command groups let tools and humans browse the library surface
+  without authoring a circuit. `aelm parts list|info|search` enumerates
+  parts from the stdlib and any user libraries (`-L <dir>` or
+  `--from <file>.alib`), with fuzzy search over name, description,
+  categories, and MPN, and an optional inline symbol SVG via
+  `--render-symbol`. `aelm symbols list|info|render` enumerates the
+  built-in symbol templates plus user-defined `symbol {}` blocks,
+  grouped by category, and renders any template to a standalone SVG
+  (`--params left=4,right=4` for parametric symbols). `aelm examples
+  list|get` browses the bundled example circuits, returning source and
+  an optional rendered SVG. All three honor the unified `--json`
+  envelope.
+- **MCP-friendly CLI: structured JSON, stdin piping, dry-run.** Every
+  command can now emit a unified `{ success, data, diagnostics }` JSON
+  envelope via the global `--json` flag, and read source from a pipe via
+  `--stdin` (`parse`, `check`, `fmt`, `layout`) — eliminating temp files
+  for programmatic consumers. `fmt` gains `--output -` for stdout-only
+  formatting; every `apply-*` command gains `--dry-run` (write the
+  modified source to stdout, leave the file untouched) and `--json`
+  (modified source plus a per-line change diff). `lib validate --json`
+  reports lint findings as structured data. A new `aelm pipeline`
+  compound command runs `parse`, `check`, and `render` stages in one
+  process (`--stages parse,check,render`), sharing the parse result so
+  it is markedly faster than three separate invocations; SVG is embedded
+  as text and PNG as base64 in the JSON output. Diagnostic spans in JSON
+  output use `{ line, column, length }`. Existing text/in-place behavior
+  is unchanged when the new flags are absent.
+- **MCP server (`aelm-mcp`).** A standalone Model Context Protocol
+  server (`aelm-mcp` submodule) exposes the full Aelm toolchain to
+  AI agents over stdio. 34 tools (parse, validate, format, render
+  SVG/PNG, parts/symbols/examples catalog, project analysis, dry-run
+  edit, scaffold generation, structural diff, batch render, style
+  preview, placement suggestions, calc evaluation, pattern search,
+  circuit similarity), 7 workflow prompts (design, review, debug DRC,
+  part selection, tutorial, explanation, interactive design loop), and
+  6 embedded reference-doc resources. Built on `rmcp 1.7`, invokes
+  the `aelm` CLI via subprocess. Version lockstep with the parent
+  workspace via `scripts/release.sh`.
+- **Signal connection labels.** Five new builtin symbols
+  (`signal_label_input`, `signal_label_output`, `signal_label_bidir`,
+  `signal_label_tristate`, `signal_label_passive`) for annotating signal
+  direction on nets. Nets declared as `input`/`output`/`bidirectional`/
+  `passive` now default to the corresponding signal label shape instead
+  of `power_flag`. New `stdlib/parts/signal.alib` provides matching
+  stdlib parts.
+- **Calc variable label position.** Calc `var` entries accept a new
+  `label_pos: above | below | left | right` inline hint (and the
+  matching `label_pos:` declaration inside the stylesheet `calc_var`
+  selector) to relocate the variable name + unit label relative to the
+  input box. Defaults to `above` for backwards compatibility. Inline
+  hint wins over the stylesheet value.
+- **Calc-driven plot expressions.** Trace expressions inside
+  `plots {}` now resolve any identifier defined in the same module's
+  `calcs {}` block. Editing a variable in the WebView reflows every
+  dependent plot without re-running parse / layout. The sweep variable
+  `x` always wins over a same-named calc identifier.
+- **Logarithmic plot axes.** Any axis accepts `log: true`. Sampling,
+  coordinate mapping, and tick generation all switch to log10 — Bode
+  magnitude/phase, impedance plots, thermal response, dynamic range
+  and other multi-decade engineering plots render correctly without
+  any data-side transformation. Works on x / y / y2 independently;
+  data points with non-positive coordinates on a log axis are skipped.
+- **Minor (sub) grid lines.** Plot axes accept `sub: true` (log axes
+  draw 2×–9× lines per decade) or `sub: <N>` (linear axes divide each
+  major interval into N parts), rendered as faint lines beneath the
+  major grid.
+- **Expression-driven axis range and scale.** `range:` and `scale:`
+  accept expressions referencing calc identifiers
+  (e.g. `range: fc / 100 .. fc * 100`), resolved against the live calc
+  environment at plot-evaluate time, so a plot's window tracks its
+  component values automatically. Numeric literals continue to work
+  unchanged.
+- **Calc box and formula styling.** Calc `var` boxes and `formula`
+  cards honour `style { font_size; background; font_weight }`. Boxes
+  scale with the font size and grow with the value width; variable
+  name labels render bold by default (opt out with
+  `font_weight: normal`).
+
+### Changed
+
+- **Calc rendering is theme-aware.** Calc variable boxes and formula
+  cards now pick a light or dark palette directly from the host theme,
+  so labels and values stay legible (near-white) against a dark canvas
+  instead of relying on a post-render colour remap. Plot major/minor
+  grid contrast in dark mode was also tuned up.
+
+### Fixed
+
+- **Net-tap drag duplicates `place:` clauses.** Moving a net-tap that
+  had a `{ label_offset: ... } place: ...` shape used to append a
+  second `place: (gx, gy)` clause every drag because the reverse-sync
+  helper stopped at the first `{`. The post-body `place:` is now
+  located and updated in place.
+
+- **Calc block drag uses world coordinates.** Earlier drag handlers
+  passed `(0, 0)` as the source position, so the first drop after a
+  reload could snap to a stale offset. Drags now hand the current
+  centre and snapped target centre to the reverse-sync mover, so
+  the rewritten `place:` matches the on-screen position exactly.
+
 ## [0.4.2] - 2026-05-19
 
 ### Added
@@ -713,7 +849,8 @@ bumped together by `scripts/release.sh`.
   records the lockstep policy, the six compatibility layers, and how
   each is verified.
 
-[Unreleased]: https://github.com/alphaelements/aelm/compare/v0.4.2...HEAD
+[Unreleased]: https://github.com/alphaelements/aelm/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/alphaelements/aelm/releases/tag/v0.5.0
 [0.4.2]: https://github.com/alphaelements/aelm/releases/tag/v0.4.2
 [0.4.1]: https://github.com/alphaelements/aelm/releases/tag/v0.4.1
 [0.4.0]: https://github.com/alphaelements/aelm/releases/tag/v0.4.0
